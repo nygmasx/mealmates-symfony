@@ -2,15 +2,18 @@ services:
   php:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./docker/php/Dockerfile
     volumes:
       - ./:/var/www/symfony:cached
+      - /var/www/symfony/vendor/
     depends_on:
       - database
     environment:
       DATABASE_URL: "${DATABASE_URL}"
       APP_ENV: dev
       APP_SECRET: "${APP_SECRET}"
+    networks:
+      - symfony  # Ajout du réseau ici
 
   nginx:
     image: nginx:alpine
@@ -22,7 +25,7 @@ services:
     depends_on:
       - php
     networks:
-      - symfony
+      - symfony  # Vérification du réseau
 
   database:
     image: mysql:8.0
@@ -33,7 +36,7 @@ services:
       MYSQL_USER: symfony
       MYSQL_PASSWORD: symfony
     ports:
-      - "3306:3306"
+      - "3307:3306"  # Changement du port pour éviter les conflits
     volumes:
       - db-data:/var/lib/mysql
     networks:
