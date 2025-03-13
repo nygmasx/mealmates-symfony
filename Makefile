@@ -95,13 +95,13 @@ phpmyadmin:
 	@echo -e "$(BLUE)Utilisateur: symfony$(RESET)"
 	@echo -e "$(BLUE)Mot de passe: symfony$(RESET)"
 
-reset-db:
+db:
 	@echo -e "$(YELLOW)Suppression de la base de données...$(RESET)"
 	$(CONSOLE) doctrine:database:drop --force --if-exists
 	@echo -e "$(YELLOW)Création de la base de données...$(RESET)"
 	$(CONSOLE) doctrine:database:create --if-not-exists
 	@echo -e "$(YELLOW)Exécution des migrations...$(RESET)"
-	$(CONSOLE) doctrine:migrations:migrate -n
+	$(CONSOLE) doctrine:schema:update -f
 	@echo -e "$(YELLOW)Chargement des fixtures...$(RESET)"
 	$(CONSOLE) doctrine:fixtures:load -n
 	@echo -e "$(GREEN)Base de données réinitialisée avec succès$(RESET)"
