@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.4-fpm
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -22,14 +22,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/symfony
 
-# Copy only composer files first
-COPY composer.json composer.lock ./
-
-# Install Symfony dependencies early to optimize build caching
-RUN composer install --no-interaction --optimize-autoloader --no-dev
-
-# Copy remaining project files
+# Copy the entire project
 COPY . .
+
+# Install all dependencies INCLUDING dev dependencies
+RUN composer install --no-interaction --optimize-autoloader
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/symfony/var
