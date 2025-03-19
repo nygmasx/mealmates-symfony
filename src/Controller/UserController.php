@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -24,12 +25,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/user')]
 class UserController extends AbstractController
 {
-
     public function __construct(
         private readonly EntityManagerInterface      $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly MailerInterface             $mailer,
         private readonly ValidatorInterface          $validator,
+        private readonly UserRepository              $userRepository,
         private readonly UrlGeneratorInterface       $urlGenerator,
     )
     {
@@ -115,7 +116,7 @@ class UserController extends AbstractController
     #[OA\Tag(name: "Users")]
     public function verifyUser(string $token): JsonResponse
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['verificationToken' => $token]);
+        $user = $this->userRepository->findOneBy(['verificationToken' => $token]);
 
         if (!$user) {
             return $this->json(['message' => 'Token de vérification invalide'], Response::HTTP_NOT_FOUND);
