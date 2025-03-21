@@ -1,5 +1,7 @@
 /.idea
 /compose.yml
+/env.dev
+/.env.dev           
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -9,7 +11,6 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
-
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
