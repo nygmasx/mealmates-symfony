@@ -6,22 +6,30 @@ use App\Repository\DietaryPreferencesRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: DietaryPreferencesRepository::class)]
 class DietaryPreference
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[Groups(["preferences:read"])]
+    private ?Uuid $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["preferences:read", "preferences:write"])]
     private ?string $name = null;
 
     /**
      * @var Collection<int, Profile>
      */
     #[ORM\ManyToMany(targetEntity: Profile::class, mappedBy: 'dietaryPreferences')]
+    #[Groups(["preferences:read"])]
     private Collection $profiles;
 
     public function __construct()
@@ -29,7 +37,7 @@ class DietaryPreference
         $this->profiles = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

@@ -104,6 +104,32 @@ class UserController extends AbstractController
         );
     }
 
+    #[OA\Response(
+        response: 201,
+        description: "Retourne les utilisateurs",
+        content: new OA\JsonContent(
+            ref: new Model(type: User::class, groups: ["user:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 400,
+        description: "Données invalides"
+    )]
+    #[OA\Tag(name: "Users")]
+    #[Security(name: "Bearer")]
+    #[Route('', name: 'app_users', methods: ['GET'])]
+    public function get(Request $request): JsonResponse
+    {
+        $users = $this->userRepository->findAll();
+
+        return $this->json(
+            $users,
+            Response::HTTP_CREATED,
+            [],
+            ['groups' => 'user:read']
+        );
+    }
+
     #[Route('/verify/{token}', name: 'app_user_verify', methods: ['GET'])]
     #[OA\Response(
         response: 200,

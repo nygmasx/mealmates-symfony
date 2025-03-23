@@ -6,22 +6,30 @@ use App\Repository\AvailabilityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: AvailabilityRepository::class)]
 class Availability
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[Groups(["availability:read"])]
+    private ?Uuid $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["availability:read"])]
     private ?string $dayName = null;
 
     /**
      * @var Collection<int, Profile>
      */
     #[ORM\ManyToMany(targetEntity: Profile::class, mappedBy: 'availabilities')]
+    #[Groups(["availability:read"])]
     private Collection $profiles;
 
     public function __construct()
@@ -29,7 +37,7 @@ class Availability
         $this->profiles = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
