@@ -17,28 +17,57 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $admin = new User();
+        $users = [
+            [
+                'reference' => self::REFERENCE_IDENTIFIER . 'ADMIN',
+                'email' => 'admin@mealmates.fr',
+                'firstName' => 'Admin',
+                'lastName' => 'Admin',
+                'password' => 'xxx',
+                'roles' => ['ROLE_ADMIN'],
+                'isVerified' => true,
+            ],
+            [
+                'reference' => self::REFERENCE_IDENTIFIER . 'USER',
+                'email' => 'user@mealmates.fr',
+                'firstName' => 'User',
+                'lastName' => 'User',
+                'password' => 'xxx',
+                'roles' => ['ROLE_USER'],
+                'isVerified' => true,
+            ],
+            [
+                'reference' => self::REFERENCE_IDENTIFIER . 'john',
+                'email' => 'john.doe@example.com',
+                'firstName' => 'John',
+                'lastName' => 'Doe',
+                'password' => 'password123',
+                'roles' => ['ROLE_USER'],
+                'isVerified' => true,
+            ],
+            [
+                'reference' => self::REFERENCE_IDENTIFIER . 'emma',
+                'email' => 'emma.wilson@example.com',
+                'firstName' => 'Emma',
+                'lastName' => 'Wilson',
+                'password' => 'password123',
+                'roles' => ['ROLE_USER'],
+                'isVerified' => true,
+            ],
+        ];
 
-        $admin->setEmail('admin@mealmates.fr')
-            ->setIsVerified(true)
-            ->setFirstName('Admin')
-            ->setLastName('Admin')
-            ->setRoles(['ROLE_ADMIN'])
-            ->setPassword($this->passwordHasher->hashPassword($admin, 'xxx'));
-        $this->setReference(self::REFERENCE_IDENTIFIER . 'ADMIN', $admin);
+        foreach ($users as $userData) {
+            $user = new User();
+            $user->setEmail($userData['email']);
+            $user->setIsVerified($userData['isVerified']);
+            $user->setFirstName($userData['firstName']);
+            $user->setLastName($userData['lastName']);
+            $user->setRoles($userData['roles']);
+            $user->setPassword($this->passwordHasher->hashPassword($user, $userData['password']));
 
-        $user = new User();
-
-        $user->setEmail('user@mealmates.fr')
-            ->setIsVerified(true)
-            ->setFirstName('User')
-            ->setLastName('User')
-            ->setRoles(['ROLE_USER'])
-            ->setPassword($this->passwordHasher->hashPassword($user, 'xxx'));
-        $this->setReference(self::REFERENCE_IDENTIFIER . 'USER', $user);
-
-        $manager->persist($admin);
-        $manager->persist($user);
+            $manager->persist($user);
+            $this->addReference($userData['reference'], $user);
+        }
 
         $manager->flush();
     }
