@@ -130,6 +130,32 @@ class UserController extends AbstractController
         );
     }
 
+    #[Route('/profile', name: 'app_user_profile', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: "Retourne le profil de l'utilisateur connecté",
+        content: new OA\JsonContent(
+            ref: new Model(type: User::class, groups: ["user:read"])
+        )
+    )]
+    #[OA\Tag(name: "Users")]
+    #[Security(name: "Bearer")]
+    public function profile(): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->json(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return $this->json(
+            $user,
+            Response::HTTP_OK,
+            [],
+            ['groups' => 'user:read']
+        );
+    }
+
     #[Route('/verify/{token}', name: 'app_user_verify', methods: ['GET'])]
     #[OA\Response(
         response: 200,
