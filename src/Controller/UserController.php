@@ -94,8 +94,6 @@ class UserController extends AbstractController
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 
-        $this->sendVerificationEmail($user);
-
         return $this->json(
             $user,
             Response::HTTP_CREATED,
