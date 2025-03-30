@@ -8,23 +8,27 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: username
+                property: email
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: api_login_check
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+        api:
+            pattern: ^/api
+            stateless: true
+            jwt: ~
         main:
             lazy: true
             provider: app_user_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                enable_csrf: true
-                default_target_path: app_home
-            logout:
-                path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
