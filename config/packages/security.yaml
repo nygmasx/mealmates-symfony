@@ -13,6 +13,24 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+
+        # OAuth connection endpoints
+        oauth_connect:
+            pattern: ^/api/connect
+            stateless: false
+            provider: app_user_provider
+            oauth:
+                resource_owners:
+                    google: /api/connect/check-google
+                    facebook: /api/connect/check-facebook
+                    my_custom_provider: /api/connect/check-my_custom_provider
+                login_path: /api/connect
+                check_path: /api/connect/login_check
+                failure_path: /api/connect/failure
+                oauth_user_provider:
+                    service: App\Security\OAuthUserProvider
+                success_handler: App\Security\OAuthSuccessHandler
+
         login:
             pattern: ^/api/login
             stateless: true
@@ -22,23 +40,21 @@ security:
                 password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
         api:
             pattern: ^/api
             stateless: true
             jwt: ~
+
         main:
             lazy: true
             provider: app_user_provider
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/api/connect, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 

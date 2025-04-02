@@ -1,0 +1,16 @@
+api_oauth_redirect:
+    resource: "@HWIOAuthBundle/Resources/config/routing/redirect.php"
+    prefix:   /api/connect
+
+api_oauth_connect:
+    resource: "@HWIOAuthBundle/Resources/config/routing/connect.php"
+    prefix:   /api/connect
+
+api_oauth_login:
+    resource: "@HWIOAuthBundle/Resources/config/routing/login.php"
+    prefix:   /api/connect
+
+# Optional: Add a custom connect controller route if needed
+api_oauth_callback:
+    path: /api/connect/callback
+    controller: App\Controller\OAuthController::callback

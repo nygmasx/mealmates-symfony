@@ -1,0 +1,24 @@
+hwi_oauth:
+  firewall_names: [ oauth_connect ]
+
+  # Configuration for resource owners
+
+  connect:
+    account_connector: App\Security\OAuthUserProvider
+
+  resource_owners:
+    google:
+      type: google
+      client_id: '%env(GOOGLE_CLIENT_ID)%'
+      client_secret: '%env(GOOGLE_CLIENT_SECRET)%'
+      scope: "email profile"
+      options:
+        csrf: true
+
+    github:
+      type: github
+      client_id: '%env(GITHUB_CLIENT_ID)%'
+      client_secret: '%env(GITHUB_CLIENT_SECRET)%'
+      scope: "user:email"
+      options:
+        csrf: true

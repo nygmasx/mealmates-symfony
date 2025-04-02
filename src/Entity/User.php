@@ -72,6 +72,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'author', orphanRemoval: true)]
     private Collection $reviews;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $oauthProvider = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $oauthId = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $oauthName = null;
+
     public function __construct()
     {
         $this->reviews = new ArrayCollection();
@@ -243,6 +252,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $review->setAuthor(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOauthProvider(): ?string
+    {
+        return $this->oauthProvider;
+    }
+
+    public function setOauthProvider(?string $oauthProvider): static
+    {
+        $this->oauthProvider = $oauthProvider;
+
+        return $this;
+    }
+
+    public function getOauthId(): ?string
+    {
+        return $this->oauthId;
+    }
+
+    public function setOauthId(?string $oauthId): static
+    {
+        $this->oauthId = $oauthId;
+
+        return $this;
+    }
+
+    public function getOauthName(): ?string
+    {
+        return $this->oauthName;
+    }
+
+    public function setOauthName(?string $oauthName): static
+    {
+        $this->oauthName = $oauthName;
 
         return $this;
     }
