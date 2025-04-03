@@ -31,6 +31,16 @@ class ProductRepository extends ServiceEntityRepository
     //        ;
     //    }
 
+    public function findProducsWithtLocations(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p, u, pr, pr.longitude, pr.latitude')
+            ->join('p.user', 'u')
+            ->join('u.profile', 'pr')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    public function findOneBySomeField($value): ?Product
     //    {
     //        return $this->createQueryBuilder('p')
