@@ -12,6 +12,7 @@ use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use OpenApi\Attributes as OA;
@@ -22,12 +23,8 @@ use Symfony\Component\HttpFoundation\Response;
 final class ProductController extends AbstractController
 {
     public function __construct(
-        private readonly ProductRepository            $productRepository,
-        private readonly ValidatorInterface           $validator,
-        private readonly EntityManagerInterface       $entityManager,
-        private readonly DietaryPreferencesRepository $dietaryPreferencesRepository,
-        private readonly AvailabilityRepository       $availabilityRepository,
-        private readonly SerializerInterface          $serializer
+        private readonly ProductRepository      $productRepository,
+        private readonly EntityManagerInterface $entityManager,
     )
     {
     }
@@ -79,7 +76,7 @@ final class ProductController extends AbstractController
 
         if (!$products) {
             return new JsonResponse(['message' => 'Produit non trouvé'], Response::HTTP_NOT_FOUND);
-        }   
+        }
 
         return $this->json(
             $products,
@@ -146,5 +143,84 @@ final class ProductController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[OA\RequestBody(
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: "filters",
+                    properties: [
+                        new OA\Property(property: "type", type: "string", example: "fruits"),
+                        new OA\Property(property: "expiresAt", type: "string", format: "date", example: "2025-05-01"),
+                        new OA\Property(property: "dietaryPreferences", type: "array", items: new OA\Items(type: "string"), example: ["1f017c88-d919-6e34-bc7f-636d01396ed1", "1f017c88-d919-6ea2-b016-636d01396ed1"]),
+                        new OA\Property(property: "minPrice", type: "number", format: "float", example: 0.5),
+                        new OA\Property(property: "maxPrice", type: "number", format: "float", example: 10.0),
+                        new OA\Property(property: "minRating", type: "number", format: "float", example: 4.0)
+                    ],
+                    type: "object"
+                )
+            ],
+            type: "object"
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Retourne les produits selon les filtres appliqués",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    #[Route('/filter', name: 'app_products_filter', methods: ['POST'])]
+    public function getByFilters(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        try {
+            $content = $request->getContent();
+            $data = json_decode($content, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return new JsonResponse([
+                    'message' => 'Format JSON invalide',
+                    'error' => json_last_error_msg(),
+                    'content' => $content
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $filters = $data['filters'] ?? [];
+
+            if (isset($filters['dietaryPreferences']) && !is_array($filters['dietaryPreferences'])) {
+                $filters['dietaryPreferences'] = [$filters['dietaryPreferences']];
+            }
+
+            $products = $this->productRepository->findProductsByFilters($filters);
+
+            if (empty($products)) {
+                return $this->json(
+                    ['message' => 'Aucun produit ne correspond aux critères de recherche'],
+                    Response::HTTP_OK,
+                    [],
+                    ['groups' => ['product:read', 'user:read', 'preferences:read']]
+                );
+            }
+
+            return $this->json(
+                $products,
+                Response::HTTP_OK,
+                [],
+                ['groups' => ['product:read', 'user:read', 'preferences:read']]
+            );
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => 'Une erreur est survenue lors du filtrage des produits',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
