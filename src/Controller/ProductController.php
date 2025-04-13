@@ -172,7 +172,7 @@ final class ProductController extends AbstractController
     )]
     #[OA\Tag(name: "Products")]
     #[Security(name: "Bearer")]
-    #[Route('/filter', name: 'app_products_filter', methods: ['GET'])]
+    #[Route('/filter', name: 'app_products_filter', methods: ['POST'])]
     public function getByFilters(Request $request): JsonResponse
     {
         $user = $this->getUser();

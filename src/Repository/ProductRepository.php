@@ -85,8 +85,6 @@ class ProductRepository extends ServiceEntityRepository
         }
 
         $query = $qb->getQuery();
-        error_log('Requête SQL générée: ' . $query->getSQL());
-        error_log('Paramètres: ' . json_encode($query->getParameters()->toArray()));
 
         return $query->getResult();
     }
