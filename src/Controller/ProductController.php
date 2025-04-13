@@ -154,7 +154,6 @@ final class ProductController extends AbstractController
                         new OA\Property(property: "type", type: "string", example: "fruits"),
                         new OA\Property(property: "expiresAt", type: "string", format: "date", example: "2025-05-01"),
                         new OA\Property(property: "dietaryPreferences", type: "array", items: new OA\Items(type: "string"), example: ["1f017c88-d919-6e34-bc7f-636d01396ed1", "1f017c88-d919-6ea2-b016-636d01396ed1"]),
-                        new OA\Property(property: "minPrice", type: "number", format: "float", example: 0.5),
                         new OA\Property(property: "maxPrice", type: "number", format: "float", example: 10.0),
                         new OA\Property(property: "minRating", type: "number", format: "float", example: 4.0)
                     ],
@@ -173,7 +172,7 @@ final class ProductController extends AbstractController
     )]
     #[OA\Tag(name: "Products")]
     #[Security(name: "Bearer")]
-    #[Route('/filter', name: 'app_products_filter', methods: ['POST'])]
+    #[Route('/filter', name: 'app_products_filter', methods: ['GET'])]
     public function getByFilters(Request $request): JsonResponse
     {
         $user = $this->getUser();

@@ -68,14 +68,6 @@ class ProductRepository extends ServiceEntityRepository
             }
         }
 
-        if (isset($filters['minPrice']) && $filters['minPrice'] !== null) {
-            $minPrice = is_numeric($filters['minPrice']) ? (float)$filters['minPrice'] : null;
-            if ($minPrice !== null) {
-                $qb->andWhere('p.price >= :minPrice')
-                    ->setParameter('minPrice', $minPrice);
-            }
-        }
-
         if (isset($filters['maxPrice']) && $filters['maxPrice'] !== null) {
             $maxPrice = is_numeric($filters['maxPrice']) ? (float)$filters['maxPrice'] : null;
             if ($maxPrice !== null) {
