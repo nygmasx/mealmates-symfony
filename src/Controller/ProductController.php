@@ -153,9 +153,8 @@ final class ProductController extends AbstractController
                     properties: [
                         new OA\Property(property: "type", type: "string", example: "fruits"),
                         new OA\Property(property: "expiresAt", type: "string", format: "date", example: "2025-05-01"),
-                        new OA\Property(property: "dietaryPreferences", type: "array", items: new OA\Items(type: "string"), example: ["1f017c88-d919-6e34-bc7f-636d01396ed1", "1f017c88-d919-6ea2-b016-636d01396ed1"]),
+                        new OA\Property(property: "dietaryPreferences", type: "array", items: new OA\Items(type: "string"), example: ["1", "3"]),
                         new OA\Property(property: "maxPrice", type: "number", format: "float", example: 10.0),
-                        new OA\Property(property: "minRating", type: "number", format: "float", example: 4.0)
                     ],
                     type: "object"
                 )
@@ -180,46 +179,25 @@ final class ProductController extends AbstractController
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
 
-        try {
-            $content = $request->getContent();
-            $data = json_decode($content, true);
+        $data = json_decode($request->getContent(), true);
+        $filters = $data['filters'] ?? [];
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return new JsonResponse([
-                    'message' => 'Format JSON invalide',
-                    'error' => json_last_error_msg(),
-                    'content' => $content
-                ], Response::HTTP_BAD_REQUEST);
-            }
+        $products = $this->productRepository->findProductsByFilters($filters);
 
-            $filters = $data['filters'] ?? [];
-
-            if (isset($filters['dietaryPreferences']) && !is_array($filters['dietaryPreferences'])) {
-                $filters['dietaryPreferences'] = [$filters['dietaryPreferences']];
-            }
-
-            $products = $this->productRepository->findProductsByFilters($filters);
-
-            if (empty($products)) {
-                return $this->json(
-                    ['message' => 'Aucun produit ne correspond aux critères de recherche'],
-                    Response::HTTP_OK,
-                    [],
-                    ['groups' => ['product:read', 'user:read', 'preferences:read']]
-                );
-            }
-
+        if (empty($products)) {
             return $this->json(
-                $products,
+                ['message' => 'Aucun produit ne correspond aux critères de recherche'],
                 Response::HTTP_OK,
                 [],
                 ['groups' => ['product:read', 'user:read', 'preferences:read']]
             );
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'message' => 'Une erreur est survenue lors du filtrage des produits',
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+
+        return $this->json(
+            $products,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['product:read', 'user:read', 'preferences:read']]
+        );
     }
 }
