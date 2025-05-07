@@ -3,8 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Product;
+use App\Entity\Profile;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use DateTimeImmutable;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -88,4 +91,118 @@ class ProductRepository extends ServiceEntityRepository
 
         return $query->getResult();
     }
+
+    public function findProductsByPreviousSellers(array $sellerIds): array
+    {
+        if (empty($sellerIds)) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('p')
+            ->select('p, u')
+            ->join('p.user', 'u')
+            ->where('u.id IN (:sellerIds)')
+            ->setParameter('sellerIds', $sellerIds)
+            ->orderBy('p.expiresAt', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findExpiringToday(): array
+    {
+        $startOfDay = new \DateTimeImmutable('today midnight', new \DateTimeZone('Europe/Paris'));
+        $endOfDay = new \DateTimeImmutable('today 23:59:59', new \DateTimeZone('Europe/Paris'));
+
+        return $this->createQueryBuilder('p')
+            ->select('p, u')
+            ->join('p.user', 'u')
+            ->where('p.expiresAt BETWEEN :start AND :end')
+            ->setParameter('start', $startOfDay)
+            ->setParameter('end', $endOfDay)
+            ->orderBy('p.price', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findVeganProducts(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p, u')
+            ->join('p.user', 'u')
+            ->join('p.dietaryPreferences', 'dp')
+            ->where('dp.name = :preference')
+            ->setParameter('preference', 'vegan')
+            ->orderBy('p.price', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findLocalTrendingProducts(float $latitude, float $longitude, float $radius = 10.0): array
+    {
+        $latDiff = $radius / 111.0;
+        $longDiff = $radius / (111.0 * cos(deg2rad($latitude)));
+        $minLat = $latitude - $latDiff;
+        $maxLat = $latitude + $latDiff;
+        $minLong = $longitude - $longDiff;
+        $maxLong = $longitude + $longDiff;
+
+        return $this->createQueryBuilder('p')
+            ->select('p, u')
+            ->join('p.user', 'u')
+            ->join('u.profile', 'pr')
+            ->where('pr.latitude BETWEEN :minLat AND :maxLat')
+            ->andWhere('pr.longitude BETWEEN :minLong AND :maxLong')
+            ->setParameter('minLat', $minLat)
+            ->setParameter('maxLat', $maxLat)
+            ->setParameter('minLong', $minLong)
+            ->setParameter('maxLong', $maxLong)
+            ->orderBy('p.expiresAt', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findTrendingProducts(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p, u')
+            ->join('p.user', 'u')
+            ->where('p.expiresAt > :tomorrow')
+            ->setParameter('tomorrow', new DateTimeImmutable('tomorrow'))
+            ->orderBy('p.expiresAt', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findCustomizedProducts(Profile $profile): array
+    {
+        $dietaryPreferences = $profile->getDietaryPreferences();
+
+        if (!$dietaryPreferences || count($dietaryPreferences) === 0) {
+            return $this->findProductsByFilters([
+                'expiresAt' => (new \DateTimeImmutable())->modify('+3 days')->format('Y-m-d')
+            ]);
+        }
+
+        $preferenceIds = array_map(
+            fn($preference) => $preference->getId(),
+            $dietaryPreferences->toArray()
+        );
+
+        return $this->createQueryBuilder('p')
+            ->select('p', 'u')
+            ->join('p.user', 'u')
+            ->join('p.dietaryPreferences', 'dp')
+            ->where('dp.id IN (:preferences)')
+            ->setParameter('preferences', $preferenceIds)
+            ->orderBy('p.expiresAt', 'ASC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->getResult();
+    }
+
 }
