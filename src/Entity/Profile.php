@@ -244,4 +244,15 @@ class Profile
 
         return $this;
     }
+
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
+
+    public function setProfile(?Profile $profile): self
+    {
+        $this->profile = $profile;
+        return $this;
+    }
 }
