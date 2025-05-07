@@ -374,7 +374,7 @@ final class ProductController extends AbstractController
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $products = $this->productRepository->findCustomizedProducts($user);
+        $products = $this->productRepository->findCustomizedProducts($user->getProfile());
 
         return $this->json(
             $products,
