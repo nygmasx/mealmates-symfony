@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Entity\User;
+use App\Entity\DietaryPreference;
 use App\Repository\AvailabilityRepository;
 use App\Repository\DietaryPreferencesRepository;
 use App\Repository\ProductRepository;
@@ -200,4 +201,146 @@ final class ProductController extends AbstractController
             ['groups' => ['product:read', 'user:read', 'preferences:read']]
         );
     }
+
+    #[Route('', name: 'app_product_create', methods: ['POST'])]
+    #[OA\RequestBody(
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: "title", type: "string"),
+                new OA\Property(property: "expiresAt", type: "string", format: "date"),
+                new OA\Property(property: "dietaryPreferences", type: "array", items: new OA\Items(type: "string")),
+                new OA\Property(property: "price", type: "float"),
+                new OA\Property(property: "type", type: "string")
+            ],
+            type: "object"
+        )
+    )]
+    #[OA\Response(
+        response: 201,
+        description: "Produit créé avec succès",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 400,
+        description: "Données invalides"
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    public function create(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        $product = new Product();
+        $product->setTitle($data['title']);
+        $product->setExpiresAt(new \DateTimeImmutable($data['expiresAt']));
+        $product->setPrice($data['price']);
+        $product->setType($data['type']);
+        $product->setUser($user);
+
+        if (!empty($data['dietaryPreferences'])) {
+            foreach ($data['dietaryPreferences'] as $prefId) {
+                $pref = $this->entityManager->getRepository(DietaryPreference::class)->find($prefId);
+                if ($pref) {
+                    $product->addDietaryPreference($pref);
+                }
+            }
+        }
+
+        $this->entityManager->persist($product);
+        $this->entityManager->flush();
+
+        return $this->json($product, Response::HTTP_CREATED, [], ['groups' => ['product:read']]);
+    }
+
+    #[Route('/{id}', name: 'app_product_update', methods: ['PUT'])]
+    #[OA\RequestBody(
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: "title", type: "string"),
+                new OA\Property(property: "expiresAt", type: "string", format: "date"),
+                new OA\Property(property: "dietaryPreferences", type: "array", items: new OA\Items(type: "string")),
+                new OA\Property(property: "price", type: "float"),
+                new OA\Property(property: "type", type: "string")
+            ],
+            type: "object"
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Produit mis à jour",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 404,
+        description: "Produit non trouvé"
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    public function update(Request $request, Product $product): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        $product->setTitle($data['title']);
+        $product->setExpiresAt(new \DateTimeImmutable($data['expiresAt']));
+        $product->setPrice($data['price']);
+        $product->setType($data['type']);
+
+        $product->getDietaryPreferences()->clear();
+        if (!empty($data['dietaryPreferences'])) {
+            foreach ($data['dietaryPreferences'] as $prefId) {
+                $pref = $this->entityManager->getRepository(DietaryPreference::class)->find($prefId);
+                if ($pref) {
+                    $product->addDietaryPreference($pref);
+                }
+            }
+        }
+
+        $this->entityManager->flush();
+
+        return $this->json($product, Response::HTTP_OK, [], ['groups' => ['product:read']]);
+    }
+
+    #[Route('/show/{id}', name: 'app_product_show_by_id', methods: ['GET'])]
+    #[OA\Response(
+        response: 200,
+        description: "Retourne un produit",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 404,
+        description: "Produit non trouvé"
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    public function show(Product $product): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return $this->json(
+            $product,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['product:read', 'user:read', 'preferences:read']]
+        );
+    }
+
 }
