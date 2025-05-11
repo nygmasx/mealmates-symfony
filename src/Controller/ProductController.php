@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Entity\DietaryPreference;
 use App\Repository\AvailabilityRepository;
 use App\Repository\DietaryPreferencesRepository;
+use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -26,6 +27,7 @@ final class ProductController extends AbstractController
     public function __construct(
         private readonly ProductRepository      $productRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly OrderRepository        $orderRepository,
     )
     {
     }
@@ -343,4 +345,204 @@ final class ProductController extends AbstractController
         );
     }
 
+    #[OA\Response(
+        response: 200,
+        description: "Retourne les offres des vendeurs auprès desquels l'acheteur a déjà commandé",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 401,
+        description: "Utilisateur non authentifié"
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    #[Route('/filter/recommander-a-nouveau', name: 'app_products_recommend_again', methods: ['GET'])]
+    public function getRecommendAgain(): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $profile = $user->getProfile();
+
+        if (!$profile) {
+            return new JsonResponse(['message' => 'Profil utilisateur introuvable'], Response::HTTP_NOT_FOUND);
+        }
+
+        $products = $this->productRepository->findCustomizedProducts($profile);
+
+        return $this->json(
+            $products,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['product:read', 'user:read', 'preferences:read']]
+        );
+    }
+
+    #[OA\Response(
+        response: 200,
+        description: "Retourne les produits qui expirent aujourd'hui",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 401,
+        description: "Utilisateur non authentifié"
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    #[Route('/filter/derniere-chance', name: 'app_products_last_chance', methods: ['GET'])]
+    public function getLastChance(): JsonResponse
+    {
+        if (!$this->getUser()) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $products = $this->productRepository->findExpiringToday();
+
+        return $this->json(
+            $products,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['product:read', 'user:read', 'preferences:read']]
+        );
+    }
+
+    #[OA\Response(
+        response: 200,
+        description: "Retourne uniquement des produits vegan",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 401,
+        description: "Utilisateur non authentifié"
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    #[Route('/filter/ce-soir-je-mange-vegan', name: 'app_products_vegan', methods: ['GET'])]
+    public function getVegan(): JsonResponse
+    {
+        if (!$this->getUser()) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $products = $this->productRepository->findVeganProducts();
+
+        return $this->json(
+            $products,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['product:read', 'user:read', 'preferences:read']]
+        );
+    }
+
+    #[OA\Response(
+        response: 200,
+        description: "Retourne les produits populaires dans la zone de recherche",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 401,
+        description: "Utilisateur non authentifié"
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    #[Route('/filter/tendances-locales', name: 'app_products_local_trends', methods: ['GET'])]
+    public function getLocalTrends(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $latitude = $request->query->get('latitude');
+        $longitude = $request->query->get('longitude');
+
+        if ($latitude && $longitude) {
+            $products = $this->productRepository->findLocalTrendingProducts((float)$latitude, (float)$longitude);
+        } else {
+            $userProfile = $user->getProfile();
+
+            if ($userProfile && $userProfile->getLatitude() && $userProfile->getLongitude()) {
+                $products = $this->productRepository->findLocalTrendingProducts(
+                    $userProfile->getLatitude(),
+                    $userProfile->getLongitude()
+                );
+            } else {
+                $products = $this->productRepository->findTrendingProducts();
+            }
+        }
+
+        return $this->json(
+            $products,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['product:read', 'user:read', 'preferences:read']]
+        );
+    }
+
+    #[OA\Response(
+        response: 200,
+        description: "Retourne des recommandations personnalisées",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 401,
+        description: "Utilisateur non authentifié"
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    #[Route('/filter/sur-mesure-pour-vous', name: 'app_products_customized', methods: ['GET'])]
+    public function getCustomized(): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $products = $this->productRepository->findCustomizedProducts($user->getProfile());
+
+        return $this->json(
+            $products,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['product:read', 'user:read', 'preferences:read']]
+        );
+    }
+
+    private function getLocalTrendsProducts(Request $request, User $user): array
+    {
+        $latitude = $request->query->get('latitude');
+        $longitude = $request->query->get('longitude');
+
+        if ($latitude && $longitude) {
+            return $this->productRepository->findLocalTrendingProducts((float)$latitude, (float)$longitude);
+        }
+        $userProfile = $user->getProfile();
+
+        if ($userProfile && $userProfile->getLatitude() && $userProfile->getLongitude()) {
+            return $this->productRepository->findLocalTrendingProducts(
+                $userProfile->getLatitude(),
+                $userProfile->getLongitude()
+            );
+        }
+
+        return $this->productRepository->findTrendingProducts();
+    }
 }
