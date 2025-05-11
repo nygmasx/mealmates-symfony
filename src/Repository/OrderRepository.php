@@ -20,37 +20,12 @@ class OrderRepository extends ServiceEntityRepository
     public function findPreviousSellers(User $user): array
     {
         return $this->createQueryBuilder('o')
-            ->select('DISTINCT u.id') // Sélectionner les IDs des vendeurs (utilisateurs)
-            ->join('o.products', 'p')  // Joindre la table des produits
-            ->join('p.user', 'u')     // Joindre la table des utilisateurs (vendeurs)
-            ->where('o.user = :user') // Condition pour l'utilisateur courant
+            ->select('DISTINCT u.id')
+            ->join('o.products', 'p')
+            ->join('p.user', 'u')
+            ->where('o.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
-            ->getResult(); // Retourne les IDs des vendeurs
+            ->getResult();
     }
-
-    //    /**
-    //     * @return Order[] Returns an array of Order objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('o')
-    //            ->andWhere('o.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('o.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Order
-    //    {
-    //        return $this->createQueryBuilder('o')
-    //            ->andWhere('o.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }
