@@ -38,14 +38,14 @@ final class ProfileController extends AbstractController
     #[OA\RequestBody(
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: "dietary_preferences", type: "array", items: new OA\Items(type: "integer")),
-                new OA\Property(property: "address_line1", type: "string"),
+                new OA\Property(property: "dietary_preferences", type: "array", items: new OA\Items(type: "integer"), nullable: true),
+                new OA\Property(property: "address_line1", type: "string", nullable: true),
                 new OA\Property(property: "address_line2", type: "string", nullable: true),
-                new OA\Property(property: "city", type: "string"),
-                new OA\Property(property: "zip_code", type: "string"),
+                new OA\Property(property: "city", type: "string", nullable: true),
+                new OA\Property(property: "zip_code", type: "string", nullable: true),
                 new OA\Property(property: "latitude", type: "string", nullable: true),
                 new OA\Property(property: "longitude", type: "string", nullable: true),
-                new OA\Property(property: "availabilities", type: "array", items: new OA\Items(type: "integer"))
+                new OA\Property(property: "availabilities", type: "array", items: new OA\Items(type: "integer"), nullable: true),
             ],
             type: "object"
         )
@@ -135,14 +135,14 @@ final class ProfileController extends AbstractController
     #[OA\RequestBody(
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: "dietary_preferences", type: "array", items: new OA\Items(type: "integer")),
-                new OA\Property(property: "address_line1", type: "string"),
+                new OA\Property(property: "dietary_preferences", type: "array", items: new OA\Items(type: "integer"), nullable: true),
+                new OA\Property(property: "address_line1", type: "string", nullable: true),
                 new OA\Property(property: "address_line2", type: "string", nullable: true),
-                new OA\Property(property: "city", type: "string"),
-                new OA\Property(property: "zip_code", type: "string"),
+                new OA\Property(property: "city", type: "string", nullable: true),
+                new OA\Property(property: "zip_code", type: "string", nullable: true),
                 new OA\Property(property: "latitude", type: "string", nullable: true),
                 new OA\Property(property: "longitude", type: "string", nullable: true),
-                new OA\Property(property: "availabilities", type: "array", items: new OA\Items(type: "integer"))
+                new OA\Property(property: "availabilities", type: "array", items: new OA\Items(type: "integer"), nullable: true),
             ],
             type: "object"
         )
