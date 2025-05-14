@@ -189,7 +189,6 @@ class UserController extends AbstractController
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
-
     }
 
     private function sendVerificationEmail(User $user): void
