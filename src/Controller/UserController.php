@@ -171,20 +171,25 @@ class UserController extends AbstractController
         description: "Token invalide"
     )]
     #[OA\Tag(name: "Users")]
-    public function verifyUser(string $token): JsonResponse
+    public function verifyUser(string $token): Response
     {
-        $user = $this->userRepository->findOneBy(['verificationToken' => $token]);
+        try {
+            $user = $this->userRepository->findOneBy(['verificationToken' => $token]);
 
-        if (!$user) {
-            return $this->json(['message' => 'Token de vérification invalide'], Response::HTTP_NOT_FOUND);
+            if (!$user) {
+                return $this->json(['message' => 'Token de vérification invalide'], Response::HTTP_NOT_FOUND);
+            }
+
+            $user->setIsVerified(true);
+            $user->setVerificationToken(null);
+
+            $this->entityManager->flush();
+
+            return $this->redirect('https://groupe-4.lycee-stvincent.fr/login');
+        } catch (Throwable $e) {
+            throw new BadRequestHttpException($e->getMessage());
         }
 
-        $user->setIsVerified(true);
-        $user->setVerificationToken(null);
-
-        $this->entityManager->flush();
-
-        return $this->json(['message' => 'Votre compte a été vérifié avec succès']);
     }
 
     private function sendVerificationEmail(User $user): void
