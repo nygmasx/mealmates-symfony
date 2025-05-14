@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Throwable;
 
 #[Route('/user')]
 class UserController extends AbstractController
@@ -93,6 +94,12 @@ class UserController extends AbstractController
 
         $this->entityManager->persist($user);
         $this->entityManager->flush();
+
+        try {
+            $this->sendVerificationEmail($user);
+        } catch (Throwable $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
 
         return $this->json(
             $user,
@@ -189,7 +196,7 @@ class UserController extends AbstractController
         );
 
         $email = new TemplatedEmail()
-            ->from(new Address('noreply@meal-mates.com', 'Meal Mates'))
+            ->from(new Address('sallakimrane@gmail.com', 'Meal Mates'))
             ->to($user->getEmail())
             ->subject('Veuillez confirmer votre adresse email')
             ->htmlTemplate('email/registration.html.twig')
@@ -197,6 +204,9 @@ class UserController extends AbstractController
                 'verificationUrl' => $verificationUrl,
                 'user' => $user,
             ]);
+
+        $email->getHeaders()
+            ->addTextHeader('X-Mailin-Tag', 'account-verification');
 
         $this->mailer->send($email);
     }
