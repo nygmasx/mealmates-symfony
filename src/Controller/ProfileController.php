@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Repository\AvailabilityRepository;
 use App\Repository\DietaryPreferencesRepository;
 use App\Repository\ProfileRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -17,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,6 +43,8 @@ final class ProfileController extends AbstractController
                 new OA\Property(property: "address_line2", type: "string", nullable: true),
                 new OA\Property(property: "city", type: "string"),
                 new OA\Property(property: "zip_code", type: "string"),
+                new OA\Property(property: "latitude", type: "string", nullable: true),
+                new OA\Property(property: "longitude", type: "string", nullable: true),
                 new OA\Property(property: "availabilities", type: "array", items: new OA\Items(type: "integer"))
             ],
             type: "object"
@@ -140,6 +140,8 @@ final class ProfileController extends AbstractController
                 new OA\Property(property: "address_line2", type: "string", nullable: true),
                 new OA\Property(property: "city", type: "string"),
                 new OA\Property(property: "zip_code", type: "string"),
+                new OA\Property(property: "latitude", type: "string", nullable: true),
+                new OA\Property(property: "longitude", type: "string", nullable: true),
                 new OA\Property(property: "availabilities", type: "array", items: new OA\Items(type: "integer"))
             ],
             type: "object"
