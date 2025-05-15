@@ -56,8 +56,6 @@ class Product
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'products')]
     private Collection $orders;
 
-
-
     public function __construct()
     {
         $this->dietaryPreferences = new ArrayCollection();
