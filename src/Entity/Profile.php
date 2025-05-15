@@ -30,7 +30,7 @@ class Profile
      * @var Collection<int, DietaryPreference>
      */
     #[ORM\ManyToMany(targetEntity: DietaryPreference::class, inversedBy: 'profiles')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(["profile:read", "profile:write"])]
     private Collection $dietaryPreferences;
 
@@ -62,7 +62,7 @@ class Profile
      * @var Collection<int, Review>
      */
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'reviewedUserProfile')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(["profile:read", "profile:write"])]
     private Collection $reviews;
 
@@ -70,7 +70,7 @@ class Profile
      * @var Collection<int, Availability>
      */
     #[ORM\ManyToMany(targetEntity: Availability::class, inversedBy: 'profiles')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[Groups(["profile:read", "profile:write"])]
     private Collection $availabilities;
 
