@@ -211,6 +211,7 @@ final class ProductController extends AbstractController
                 new OA\Property(property: "title", type: "string"),
                 new OA\Property(property: "expiresAt", type: "string", format: "date"),
                 new OA\Property(property: "dietaryPreferences", type: "array", items: new OA\Items(type: "string")),
+                new OA\Property(property: "dietaryPreferences", type: "array", items: new OA\Items(type: "string")),
                 new OA\Property(property: "price", type: "float"),
                 new OA\Property(property: "type", type: "string")
             ],

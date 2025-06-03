@@ -37,7 +37,7 @@ class Product
     #[Groups(["product:read", "product:write"])]
     private Collection $dietaryPreferences;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(["product:read", "product:write"])]
     private ?float $price = null;
 
@@ -55,6 +55,27 @@ class Product
      */
     #[ORM\ManyToMany(targetEntity: Order::class, mappedBy: 'products')]
     private Collection $orders;
+
+    #[ORM\Column]
+    private ?int $quantity = null;
+
+    #[ORM\Column]
+    private ?bool $isRecurring = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $recurringFrequency = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $pickingAddress = null;
+
+    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    private array $availabilities = [];
+
+    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    private array $images = [];
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -176,5 +197,131 @@ class Product
         }
 
         return $this;
+    }
+
+    public function getQuantity(): ?int
+    {
+        return $this->quantity;
+    }
+
+    public function setQuantity(int $quantity): static
+    {
+        $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function isRecurring(): ?bool
+    {
+        return $this->isRecurring;
+    }
+
+    public function setIsRecurring(bool $isRecurring): static
+    {
+        $this->isRecurring = $isRecurring;
+
+        return $this;
+    }
+
+    public function getRecurringFrequency(): ?string
+    {
+        return $this->recurringFrequency;
+    }
+
+    public function setRecurringFrequency(?string $recurringFrequency): static
+    {
+        $this->recurringFrequency = $recurringFrequency;
+
+        return $this;
+    }
+
+    public function getPickingAddress(): ?string
+    {
+        return $this->pickingAddress;
+    }
+
+    public function setPickingAddress(string $pickingAddress): static
+    {
+        $this->pickingAddress = $pickingAddress;
+
+        return $this;
+    }
+
+    public function getAvailabilities(): array
+    {
+        return $this->availabilities;
+    }
+
+    public function setAvailabilities(array $availabilities): static
+    {
+        $this->availabilities = $availabilities;
+
+        return $this;
+    }
+
+    public function getImages(): array
+    {
+        return $this->images;
+    }
+
+    public function setImages(string|array $images): static
+    {
+        if (is_string($images)) {
+            $this->images = json_decode($images, true) ?? [];
+        } else {
+            $this->images = $images;
+        }
+        $this->updatedAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getDaysUntilExpiration(): int
+    {
+        $today = new \DateTimeImmutable('today');
+        return $today->diff($this->expiresAt)->days;
+    }
+
+    public function getFirstImage(): ?string
+    {
+        return $this->images[0] ?? null;
+    }
+
+    public function hasAvailablePickupToday(): bool
+    {
+        $today = strtolower((new \DateTimeImmutable())->format('l'));
+        $frenchDays = [
+            'monday' => 'lundi',
+            'tuesday' => 'mardi',
+            'wednesday' => 'mercredi',
+            'thursday' => 'jeudi',
+            'friday' => 'vendredi',
+            'saturday' => 'samedi',
+            'sunday' => 'dimanche'
+        ];
+
+        $todayFrench = $frenchDays[$today] ?? '';
+
+        foreach ($this->availabilities as $schedule) {
+            if (isset($schedule['day']) &&
+                strtolower($schedule['day']) === $todayFrench &&
+                ($schedule['isEnabled'] ?? false)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
