@@ -12,11 +12,11 @@ use DateTimeImmutable;
 
 class ProductFixtures extends Fixture implements DependentFixtureInterface
 {
-    public const FRUITS = 'fruits';
-    public const VEGETABLES = 'vegetables';
-    public const PREPARED_MEAL = 'prepared_meal';
-    public const CAKE = 'cake';
-    public const DAIRY_PRODUCT = 'dairy_product';
+    public const TYPE_FOOD = 'food';
+    public const TYPE_BEVERAGE = 'beverage';
+    public const TYPE_BAKERY = 'bakery';
+    public const TYPE_DAIRY = 'dairy';
+    public const TYPE_OTHER = 'other';
 
     public function load(ObjectManager $manager): void
     {
@@ -33,24 +33,51 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
         $products = [
             [
                 'title' => 'Pommes Fraîches',
+                'quantity' => 5,
                 'expiresAt' => new DateTimeImmutable('+10 days'),
                 'price' => 2.99,
                 'user' => $john,
-                'type' => self::FRUITS,
+                'type' => self::TYPE_FOOD,
+                'pickingAddress' => '123 Rue des Pommes, 75001 Paris',
+                'images' => ['/uploads/products/pommes1.jpg', '/uploads/products/pommes2.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Mardi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Jeudi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '10:00', 'endTime' => '16:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
+                ],
+                'isRecurring' => false,
+                'recurringFrequency' => 'weekly',
                 'dietaryPreferences' => [
                     DietaryPreferenceFixtures::VEGETARIAN,
                     DietaryPreferenceFixtures::VEGAN,
                     DietaryPreferenceFixtures::GLUTEN_FREE,
                     DietaryPreferenceFixtures::LACTOSE_FREE,
-                    DietaryPreferenceFixtures::PALEO,
                 ],
             ],
             [
                 'title' => 'Bananes Bio',
+                'quantity' => 8,
                 'expiresAt' => new DateTimeImmutable('+7 days'),
                 'user' => $user,
                 'price' => 1.99,
-                'type' => self::FRUITS,
+                'type' => self::TYPE_FOOD,
+                'pickingAddress' => '45 Avenue des Fruits, 75002 Paris',
+                'images' => ['/uploads/products/bananes1.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Mardi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Jeudi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '09:00', 'endTime' => '17:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
+                ],
+                'isRecurring' => true,
+                'recurringFrequency' => 'weekly',
                 'dietaryPreferences' => [
                     DietaryPreferenceFixtures::VEGETARIAN,
                     DietaryPreferenceFixtures::VEGAN,
@@ -59,361 +86,259 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 ],
             ],
             [
-                'title' => 'Carottes Fraîches',
-                'expiresAt' => new DateTimeImmutable('+14 days'),
-                'user' => $admin,
-                'price' => 1.49,
-                'type' => self::VEGETABLES,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::LACTOSE_FREE,
-                    DietaryPreferenceFixtures::KETO,
-                    DietaryPreferenceFixtures::PALEO,
-                    DietaryPreferenceFixtures::LOW_CARB,
-                ],
-            ],
-            [
-                'title' => 'Brocolis Bio',
-                'expiresAt' => new DateTimeImmutable('+10 days'),
-                'user' => $user,
-                'price' => 2.29,
-                'type' => self::VEGETABLES,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::LACTOSE_FREE,
-                    DietaryPreferenceFixtures::KETO,
-                    DietaryPreferenceFixtures::PALEO,
-                    DietaryPreferenceFixtures::LOW_CARB,
-                ],
-            ],
-            [
-                'title' => 'Curry de Légumes',
+                'title' => 'Pain Artisanal au Levain',
+                'quantity' => 3,
                 'expiresAt' => new DateTimeImmutable('+3 days'),
-                'user' => $emma,
-                'price' => 8.99,
-                'type' => self::PREPARED_MEAL,
+                'user' => $admin,
+                'price' => 3.50,
+                'type' => self::TYPE_BAKERY,
+                'pickingAddress' => '78 Rue de la Boulangerie, 75003 Paris',
+                'images' => ['/uploads/products/pain1.jpg', '/uploads/products/pain2.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '07:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Mardi', 'startTime' => '07:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '07:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Jeudi', 'startTime' => '07:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '07:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '07:00', 'endTime' => '17:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
+                ],
+                'isRecurring' => true,
+                'recurringFrequency' => 'daily',
                 'dietaryPreferences' => [
                     DietaryPreferenceFixtures::VEGETARIAN,
                     DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::LACTOSE_FREE,
-                    DietaryPreferenceFixtures::HALAL,
                 ],
             ],
             [
-                'title' => 'Gâteau au Chocolat',
-                'expiresAt' => new DateTimeImmutable('+5 days'),
-                'user' => $user,
-                'price' => 12.99,
-                'type' => self::CAKE,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                ],
-            ],
-            [
-                'title' => 'Yaourt Grec',
+                'title' => 'Yaourt Grec Maison',
+                'quantity' => 10,
                 'expiresAt' => new DateTimeImmutable('+14 days'),
                 'user' => $john,
                 'price' => 3.49,
-                'type' => self::DAIRY_PRODUCT,
+                'type' => self::TYPE_DAIRY,
+                'pickingAddress' => '12 Place du Marché, 75004 Paris',
+                'images' => ['/uploads/products/yaourt1.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Mardi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Jeudi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '10:00', 'endTime' => '16:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
+                ],
+                'isRecurring' => false,
+                'recurringFrequency' => 'weekly',
                 'dietaryPreferences' => [
                     DietaryPreferenceFixtures::VEGETARIAN,
                     DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::KETO,
-                    DietaryPreferenceFixtures::LOW_CARB,
                 ],
             ],
             [
-                'title' => 'Fromage Cheddar Bio',
-                'expiresAt' => new DateTimeImmutable('+30 days'),
-                'user' => $admin,
-                'price' => 5.99,
-                'type' => self::DAIRY_PRODUCT,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::KETO,
-                    DietaryPreferenceFixtures::LOW_CARB,
-                ],
-            ],
-            [
-                'title' => 'Saumon Grillé aux Légumes',
+                'title' => 'Jus d\'Orange Pressé',
+                'quantity' => 6,
                 'expiresAt' => new DateTimeImmutable('+2 days'),
                 'user' => $emma,
-                'price' => 14.99,
-                'type' => self::PREPARED_MEAL,
+                'price' => 4.25,
+                'type' => self::TYPE_BEVERAGE,
+                'pickingAddress' => '56 Boulevard des Boissons, 75005 Paris',
+                'images' => ['/uploads/products/jus1.jpg', '/uploads/products/jus2.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Mardi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Jeudi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
+                ],
+                'isRecurring' => false,
+                'recurringFrequency' => 'weekly',
                 'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::PESCATARIAN,
+                    DietaryPreferenceFixtures::VEGETARIAN,
+                    DietaryPreferenceFixtures::VEGAN,
+                    DietaryPreferenceFixtures::GLUTEN_FREE,
+                ],
+            ],
+            [
+                'title' => 'Gâteau au Chocolat Vegan',
+                'quantity' => 1,
+                'expiresAt' => new DateTimeImmutable('+5 days'),
+                'user' => $user2,
+                'price' => 12.99,
+                'type' => self::TYPE_BAKERY,
+                'pickingAddress' => '89 Rue des Desserts, 75006 Paris',
+                'images' => ['/uploads/products/gateau1.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Mardi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Mercredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Jeudi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '10:00', 'endTime' => '17:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true]
+                ],
+                'isRecurring' => false,
+                'recurringFrequency' => 'weekly',
+                'dietaryPreferences' => [
+                    DietaryPreferenceFixtures::VEGETARIAN,
+                    DietaryPreferenceFixtures::VEGAN,
+                ],
+            ],
+            [
+                'title' => 'Légumes de Saison Bio',
+                'quantity' => 15,
+                'expiresAt' => new DateTimeImmutable('+8 days'),
+                'user' => $user3,
+                'price' => 6.50,
+                'type' => self::TYPE_FOOD,
+                'pickingAddress' => '34 Marché Bio, 75007 Paris',
+                'images' => ['/uploads/products/legumes1.jpg', '/uploads/products/legumes2.jpg', '/uploads/products/legumes3.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '06:00', 'endTime' => '14:00', 'isEnabled' => true],
+                    ['day' => 'Mardi', 'startTime' => '06:00', 'endTime' => '14:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '06:00', 'endTime' => '14:00', 'isEnabled' => true],
+                    ['day' => 'Jeudi', 'startTime' => '06:00', 'endTime' => '14:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '06:00', 'endTime' => '14:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '06:00', 'endTime' => '15:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
+                ],
+                'isRecurring' => true,
+                'recurringFrequency' => 'weekly',
+                'dietaryPreferences' => [
+                    DietaryPreferenceFixtures::VEGETARIAN,
+                    DietaryPreferenceFixtures::VEGAN,
                     DietaryPreferenceFixtures::GLUTEN_FREE,
                     DietaryPreferenceFixtures::LACTOSE_FREE,
-                    DietaryPreferenceFixtures::KETO,
-                    DietaryPreferenceFixtures::PALEO,
-                    DietaryPreferenceFixtures::LOW_CARB,
                 ],
             ],
             [
-                'title' => 'Burger Végétal',
-                'expiresAt' => new DateTimeImmutable('+7 days'),
-                'user' => $john,
-                'price' => 9.99,
-                'type' => self::PREPARED_MEAL,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::HALAL,
-                ],
-            ],
-            [
-                'title' => 'Fraises Bio de Senlis',
-                'expiresAt' => new DateTimeImmutable('+5 days'),
-                'user' => $user,
-                'price' => 4.99,
-                'type' => self::FRUITS,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::PALEO,
-                ],
-            ],
-            [
-                'title' => 'Pain aux Céréales Maison',
-                'expiresAt' => new DateTimeImmutable('+3 days'),
-                'user' => $user,
-                'price' => 3.50,
-                'type' => self::FRUITS,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                ],
-            ],
-            [
-                'title' => 'Salade de Quinoa aux Légumes',
-                'expiresAt' => new DateTimeImmutable('+3 days'),
-                'user' => $user3,
-                'price' => 7.50,
-                'type' => self::PREPARED_MEAL,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                ],
-            ],
-            [
-                'title' => 'Jus de Légumes Maison',
-                'expiresAt' => new DateTimeImmutable('+2 days'),
-                'user' => $user2,
-                'price' => 4.25,
-                'type' => self::FRUITS,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                ],
-            ],
-            [
-                'title' => 'Cookies Vegan aux Pépites de Chocolat',
-                'expiresAt' => new DateTimeImmutable('+7 days'),
+                'title' => 'Fromage de Chèvre Fermier',
+                'quantity' => 4,
+                'expiresAt' => new DateTimeImmutable('+20 days'),
                 'user' => $user4,
-                'price' => 5.99,
-                'type' => self::CAKE,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
+                'price' => 8.99,
+                'type' => self::TYPE_DAIRY,
+                'pickingAddress' => '67 Chemin de la Ferme, 75008 Paris',
+                'images' => ['/uploads/products/fromage1.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Mardi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Jeudi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '09:00', 'endTime' => '17:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
                 ],
-            ],
-            [
-                'title' => 'Crème Dessert sans Lactose',
-                'expiresAt' => new DateTimeImmutable('+5 days'),
-                'user' => $user2,
-                'price' => 3.99,
-                'type' => self::DAIRY_PRODUCT,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                ],
-            ],
-            [
-                'title' => 'Pâtes Fraîches sans Gluten',
-                'expiresAt' => new DateTimeImmutable('+4 days'),
-                'user' => $user2,
-                'price' => 6.50,
-                'type' => self::VEGETABLES,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE
-                ],
-            ],
-            [
-                'title' => 'Filet de Cabillaud Frais',
-                'expiresAt' => new DateTimeImmutable('+2 days'),
-                'user' => $user3,
-                'price' => 12.99,
-                'type' => self::FRUITS,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::PESCATARIAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::LOW_CARB,
-                ],
-            ],
-            [
-                'title' => 'Salade de Crevettes à l\'Avocat',
-                'expiresAt' => new DateTimeImmutable('+1 day'),
-                'user' => $user3,
-                'price' => 9.99,
-                'type' => self::PREPARED_MEAL,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::PESCATARIAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::LOW_CARB,
-                ],
-            ],
-            [
-                'title' => 'Omelette aux Légumes',
-                'expiresAt' => new DateTimeImmutable('+2 days'),
-                'user' => $user3,
-                'price' => 6.49,
-                'type' => self::PREPARED_MEAL,
+                'isRecurring' => false,
+                'recurringFrequency' => 'weekly',
                 'dietaryPreferences' => [
                     DietaryPreferenceFixtures::VEGETARIAN,
                     DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::LOW_CARB,
                 ],
             ],
             [
-                'title' => 'Gâteau Vegan à la Banane',
-                'expiresAt' => new DateTimeImmutable('+4 days'),
-                'user' => $user4,
-                'price' => 11.99,
-                'type' => self::CAKE,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                ],
-            ],
-            [
-                'title' => 'Hummus Maison',
-                'expiresAt' => new DateTimeImmutable('+5 days'),
-                'user' => $user4,
-                'price' => 4.75,
-                'type' => self::VEGETABLES,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                ],
-            ],
-            [
-                'title' => 'Lait d\'Amande Fait Maison',
-                'expiresAt' => new DateTimeImmutable('+7 days'),
-                'user' => $user4,
-                'price' => 3.99,
-                'type' => self::DAIRY_PRODUCT,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                ],
-            ],
-            [
-                'title' => 'Tajine de Légumes Halal',
-                'expiresAt' => new DateTimeImmutable('+3 days'),
-                'user' => $user5,
-                'price' => 13.50,
-                'type' => self::PREPARED_MEAL,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                    DietaryPreferenceFixtures::VEGAN,
-                    DietaryPreferenceFixtures::HALAL,
-                ],
-            ],
-            [
-                'title' => 'Smoothie Protéiné',
+                'title' => 'Smoothie Vert Détox',
+                'quantity' => 8,
                 'expiresAt' => new DateTimeImmutable('+1 day'),
                 'user' => $user5,
                 'price' => 5.25,
-                'type' => self::FRUITS,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
+                'type' => self::TYPE_BEVERAGE,
+                'pickingAddress' => '90 Avenue de la Santé, 75009 Paris',
+                'images' => ['/uploads/products/smoothie1.jpg', '/uploads/products/smoothie2.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '07:00', 'endTime' => '15:00', 'isEnabled' => true],
+                    ['day' => 'Mardi', 'startTime' => '07:00', 'endTime' => '15:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '07:00', 'endTime' => '15:00', 'isEnabled' => true],
+                    ['day' => 'Jeudi', 'startTime' => '07:00', 'endTime' => '15:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '07:00', 'endTime' => '15:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '08:00', 'endTime' => '14:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
                 ],
-            ],
-            [
-                'title' => 'Poulet Rôti aux Herbes',
-                'expiresAt' => new DateTimeImmutable('+2 days'),
-                'user' => $user5,
-                'price' => 10.99,
-                'type' => self::PREPARED_MEAL,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::HALAL,
-                ],
-            ],
-            [
-                'title' => 'Granola Paléo Maison',
-                'expiresAt' => new DateTimeImmutable('+14 days'),
-                'user' => $user6,
-                'price' => 8.75,
-                'type' => self::FRUITS,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::PALEO,
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                ],
-            ],
-            [
-                'title' => 'Tarte aux Pommes sans Sucre',
-                'expiresAt' => new DateTimeImmutable('+3 days'),
-                'user' => $user6,
-                'price' => 11.50,
-                'type' => self::CAKE,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::PALEO,
-                ],
-            ],
-            [
-                'title' => 'Bœuf Séché Maison',
-                'expiresAt' => new DateTimeImmutable('+21 days'),
-                'user' => $user6,
-                'price' => 14.99,
-                'type' => self::FRUITS,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::PALEO,
-                ],
-            ],
-            [
-                'title' => 'Pain Low-Carb aux Graines',
-                'expiresAt' => new DateTimeImmutable('+5 days'),
-                'user' => $john,
-                'price' => 6.75,
-                'type' => self::FRUITS,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::GLUTEN_FREE,
-                    DietaryPreferenceFixtures::LOW_CARB,
-                ],
-            ],
-            [
-                'title' => 'Lasagnes Végétariennes',
-                'expiresAt' => new DateTimeImmutable('+4 days'),
-                'user' => $emma,
-                'price' => 9.50,
-                'type' => self::PREPARED_MEAL,
-                'dietaryPreferences' => [
-                    DietaryPreferenceFixtures::VEGETARIAN,
-                ],
-            ],
-            [
-                'title' => 'Tofu Grillé aux Épices',
-                'expiresAt' => new DateTimeImmutable('+7 days'),
-                'user' => $admin,
-                'price' => 7.25,
-                'type' => self::PREPARED_MEAL,
+                'isRecurring' => true,
+                'recurringFrequency' => 'daily',
                 'dietaryPreferences' => [
                     DietaryPreferenceFixtures::VEGETARIAN,
                     DietaryPreferenceFixtures::VEGAN,
                     DietaryPreferenceFixtures::GLUTEN_FREE,
+                ],
+            ],
+            [
+                'title' => 'Miel de Fleurs Sauvages',
+                'quantity' => 12,
+                'expiresAt' => new DateTimeImmutable('+365 days'), // Le miel ne périme pratiquement jamais
+                'user' => $user6,
+                'price' => 9.50,
+                'type' => self::TYPE_OTHER,
+                'pickingAddress' => '23 Rucher des Abeilles, 75010 Paris',
+                'images' => ['/uploads/products/miel1.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Mardi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Jeudi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '09:00', 'endTime' => '16:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
+                ],
+                'isRecurring' => false,
+                'recurringFrequency' => 'monthly',
+                'dietaryPreferences' => [
+                    DietaryPreferenceFixtures::VEGETARIAN,
+                    DietaryPreferenceFixtures::GLUTEN_FREE,
+                ],
+            ],
+            [
+                'title' => 'Pain de la Veille (Gratuit)',
+                'quantity' => 5,
+                'expiresAt' => new DateTimeImmutable('+1 day'),
+                'user' => $admin,
+                'price' => 0,
+                'type' => self::TYPE_BAKERY,
+                'pickingAddress' => '78 Rue de la Boulangerie, 75003 Paris',
+                'images' => ['/uploads/products/pain_gratuit1.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '18:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Mardi', 'startTime' => '18:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Mercredi', 'startTime' => '18:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Jeudi', 'startTime' => '18:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Vendredi', 'startTime' => '18:00', 'endTime' => '19:00', 'isEnabled' => true],
+                    ['day' => 'Samedi', 'startTime' => '17:00', 'endTime' => '18:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
+                ],
+                'isRecurring' => true,
+                'recurringFrequency' => 'daily',
+                'dietaryPreferences' => [
+                    DietaryPreferenceFixtures::VEGETARIAN,
+                    DietaryPreferenceFixtures::VEGAN,
+                ],
+            ],
+            [
+                'title' => 'Légumes Invendus (Don)',
+                'quantity' => 20,
+                'expiresAt' => new DateTimeImmutable('+2 days'),
+                'user' => $user3,
+                'price' => 0, // Donation
+                'type' => self::TYPE_FOOD,
+                'pickingAddress' => '34 Marché Bio, 75007 Paris',
+                'images' => ['/uploads/products/legumes_don1.jpg'],
+                'availabilities' => [
+                    ['day' => 'Lundi', 'startTime' => '17:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Mardi', 'startTime' => '17:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Mercredi', 'startTime' => '17:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Jeudi', 'startTime' => '17:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Vendredi', 'startTime' => '17:00', 'endTime' => '18:00', 'isEnabled' => false],
+                    ['day' => 'Samedi', 'startTime' => '14:00', 'endTime' => '15:00', 'isEnabled' => true],
+                    ['day' => 'Dimanche', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false]
+                ],
+                'isRecurring' => true,
+                'recurringFrequency' => 'weekly',
+                'dietaryPreferences' => [
+                    DietaryPreferenceFixtures::VEGETARIAN,
+                    DietaryPreferenceFixtures::VEGAN,
+                    DietaryPreferenceFixtures::GLUTEN_FREE,
+                    DietaryPreferenceFixtures::LACTOSE_FREE,
                 ],
             ],
         ];
@@ -421,11 +346,19 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
         foreach ($products as $productData) {
             $product = new Product();
             $product->setTitle($productData['title'])
+                ->setQuantity($productData['quantity'])
                 ->setExpiresAt($productData['expiresAt'])
                 ->setPrice($productData['price'])
                 ->setType($productData['type'])
-                ->setUser($productData['user']);
+                ->setPickingAddress($productData['pickingAddress'])
+                ->setImages(json_encode($productData['images']))
+                ->setAvailabilities($productData['availabilities'])
+                ->setIsRecurring($productData['isRecurring'])
+                ->setRecurringFrequency($productData['recurringFrequency'])
+                ->setUser($productData['user'])
+                ->setUpdatedAt(new DateTimeImmutable());
 
+            // Ajouter les préférences alimentaires
             foreach ($productData['dietaryPreferences'] as $preferenceReference) {
                 $preference = $this->getReference($preferenceReference, DietaryPreference::class);
                 $product->addDietaryPreference($preference);

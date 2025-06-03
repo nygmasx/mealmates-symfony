@@ -68,10 +68,10 @@ class Product
     #[ORM\Column(length: 255)]
     private ?string $pickingAddress = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    #[ORM\Column(type: Types::JSON)]
     private array $availabilities = [];
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY)]
+    #[ORM\Column(type: Types::JSON)]
     private array $images = [];
 
     #[ORM\Column]
