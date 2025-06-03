@@ -211,7 +211,6 @@ final class ProductController extends AbstractController
             schema: new OA\Schema(
                 properties: [
                     new OA\Property(property: "title", type: "string"),
-                    new OA\Property(property: "description", type: "string"),
                     new OA\Property(property: "quantity", type: "integer"),
                     new OA\Property(property: "expirationDate", type: "string", format: "date"),
                     new OA\Property(property: "isDonation", type: "boolean"),
@@ -259,7 +258,6 @@ final class ProductController extends AbstractController
 
         try {
             $title = $request->request->get('title');
-            $description = $request->request->get('description');
             $quantity = (int)$request->request->get('quantity', 1);
             $expirationDate = $request->request->get('expirationDate');
             $isDonation = filter_var($request->request->get('isDonation', false), FILTER_VALIDATE_BOOLEAN);
@@ -274,9 +272,6 @@ final class ProductController extends AbstractController
             $errors = [];
             if (empty($title)) {
                 $errors['title'] = 'Le titre est requis';
-            }
-            if (empty($description)) {
-                $errors['description'] = 'La description est requise';
             }
             if ($quantity < 1) {
                 $errors['quantity'] = 'La quantité doit être au moins 1';
