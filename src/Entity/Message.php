@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
@@ -16,35 +17,44 @@ class Message
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[Groups(['message:read'])]
     private ?Uuid $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['message:read'])]
     private ?string $content = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['message:read'])]
     private ?array $attachments = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['message:read'])]
     private ?string $type = null;
 
     #[ORM\Column]
+    #[Groups(['message:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['message:read'])]
     private ?\DateTimeImmutable $editedAt = null;
 
     #[ORM\Column]
+    #[Groups(['message:read'])]
     private ?bool $isDeleted = null;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['message:read'])]
     private ?Chat $chat = null;
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['message:read'])]
     private ?User $sender = null;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

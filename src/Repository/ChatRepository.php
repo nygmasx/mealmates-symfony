@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Chat;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -16,28 +17,24 @@ class ChatRepository extends ServiceEntityRepository
         parent::__construct($registry, Chat::class);
     }
 
-    //    /**
-    //     * @return Chat[] Returns an array of Chat objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findByUser(User $user): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.messages', 'm')
+            ->where('c.userOne = :user OR c.userTwo = :user')
+            ->setParameter('user', $user)
+            ->orderBy('c.updatedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Chat
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findBetweenUsers(User $userOne, User $userTwo): ?Chat
+    {
+        return $this->createQueryBuilder('c')
+            ->where('(c.userOne = :userOne AND c.userTwo = :userTwo) OR (c.userOne = :userTwo AND c.userTwo = :userOne)')
+            ->setParameter('userOne', $userOne)
+            ->setParameter('userTwo', $userTwo)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

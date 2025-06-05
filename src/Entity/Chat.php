@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: ChatRepository::class)]
@@ -17,36 +18,45 @@ class Chat
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[Groups(['chat:list', 'chat:read'])]
     private ?Uuid $id = null;
 
     #[ORM\Column]
+    #[Groups(['chat:list', 'chat:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['chat:list', 'chat:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'chats')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['chat:list', 'chat:read'])]
     private ?Product $relatedProduct = null;
 
     /**
      * @var Collection<int, Message>
      */
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'chat')]
+    #[Groups(['chat:read'])]
     private Collection $messages;
 
     #[ORM\ManyToOne(inversedBy: 'chats')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['chat:list', 'chat:read'])]
     private ?User $userOne = null;
 
     #[ORM\ManyToOne(inversedBy: 'chats')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['chat:list', 'chat:read'])]
     private ?User $userTwo = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups([ 'chat:read'])]
     private ?\DateTimeImmutable $userOneLastSeenAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['chat:read'])]
     private ?\DateTimeImmutable $userTwoLastSeenAt = null;
 
     public function __construct()
@@ -54,7 +64,7 @@ class Chat
         $this->messages = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }
