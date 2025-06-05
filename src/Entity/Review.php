@@ -24,6 +24,9 @@ class Review
     #[ORM\ManyToOne(inversedBy: 'reviews')]
     private ?Profile $reviewedUserProfile = null;
 
+    #[ORM\Column]
+    private ?int $star = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -49,6 +52,18 @@ class Review
     public function setReviewedUserProfile(?Profile $reviewedUserProfile): static
     {
         $this->reviewedUserProfile = $reviewedUserProfile;
+
+        return $this;
+    }
+
+    public function getStar(): ?int
+    {
+        return $this->star;
+    }
+
+    public function setStar(int $star): static
+    {
+        $this->star = $star;
 
         return $this;
     }
