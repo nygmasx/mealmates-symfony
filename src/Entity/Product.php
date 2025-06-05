@@ -77,10 +77,17 @@ class Product
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * @var Collection<int, Chat>
+     */
+    #[ORM\OneToMany(targetEntity: Chat::class, mappedBy: 'relatedProduct')]
+    private Collection $chats;
+
     public function __construct()
     {
         $this->dietaryPreferences = new ArrayCollection();
         $this->orders = new ArrayCollection();
+        $this->chats = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -323,5 +330,35 @@ class Product
         }
 
         return false;
+    }
+
+    /**
+     * @return Collection<int, Chat>
+     */
+    public function getChats(): Collection
+    {
+        return $this->chats;
+    }
+
+    public function addChat(Chat $chat): static
+    {
+        if (!$this->chats->contains($chat)) {
+            $this->chats->add($chat);
+            $chat->setRelatedProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChat(Chat $chat): static
+    {
+        if ($this->chats->removeElement($chat)) {
+            // set the owning side to null (unless already changed)
+            if ($chat->getRelatedProduct() === $this) {
+                $chat->setRelatedProduct(null);
+            }
+        }
+
+        return $this;
     }
 }
