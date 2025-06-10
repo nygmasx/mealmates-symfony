@@ -4,9 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Chat;
 use App\Entity\Message;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<Message>
@@ -18,37 +18,27 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
-    public function findByChatOrderedByDate(Chat $chat, int $limit = 50): array
+    public function findNewMessages(Chat $chat, string $afterId): array
     {
-        return $this->createQueryBuilder('m')
-            ->where('m.chat = :chat')
-            ->andWhere('m.isDeleted = false')
-            ->setParameter('chat', $chat)
-            ->orderBy('m.createdAt', 'ASC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
-    }
+        try {
+            $afterUuid = Uuid::fromString($afterId);
 
-    public function getUnreadCount(Chat $chat, User $user): int
-    {
-        $lastSeenAt = $chat->getUserOne() === $user
-            ? $chat->getUserOneLastSeenAt()
-            : $chat->getUserTwoLastSeenAt();
+            $afterMessage = $this->find($afterUuid);
+            if (!$afterMessage) {
+                return [];
+            }
 
-        $qb = $this->createQueryBuilder('m')
-            ->select('COUNT(m.id)')
-            ->where('m.chat = :chat')
-            ->andWhere('m.sender != :user')
-            ->andWhere('m.isDeleted = false')
-            ->setParameter('chat', $chat)
-            ->setParameter('user', $user);
-
-        if ($lastSeenAt) {
-            $qb->andWhere('m.createdAt > :lastSeen')
-                ->setParameter('lastSeen', $lastSeenAt);
+            return $this->createQueryBuilder('m')
+                ->where('m.chat = :chat')
+                ->andWhere('m.isDeleted = false')
+                ->andWhere('m.createdAt > :afterDate')
+                ->setParameter('chat', $chat)
+                ->setParameter('afterDate', $afterMessage->getCreatedAt())
+                ->orderBy('m.createdAt', 'ASC')
+                ->getQuery()
+                ->getResult();
+        } catch (\Exception $e) {
+            return [];
         }
-
-        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 }

@@ -20,7 +20,6 @@ class ChatRepository extends ServiceEntityRepository
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('c')
-            ->leftJoin('c.messages', 'm')
             ->where('c.userOne = :user OR c.userTwo = :user')
             ->setParameter('user', $user)
             ->orderBy('c.updatedAt', 'DESC')
@@ -28,13 +27,43 @@ class ChatRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findBetweenUsers(User $userOne, User $userTwo): ?Chat
+    public function getUnreadCounts(User $user): array
     {
-        return $this->createQueryBuilder('c')
-            ->where('(c.userOne = :userOne AND c.userTwo = :userTwo) OR (c.userOne = :userTwo AND c.userTwo = :userOne)')
-            ->setParameter('userOne', $userOne)
-            ->setParameter('userTwo', $userTwo)
-            ->getQuery()
-            ->getOneOrNullResult();
+        $qb = $this->createQueryBuilder('c')
+            ->select('c.id as chatId')
+            ->addSelect('COUNT(m.id) as unreadCount')
+            ->leftJoin('c.messages', 'm')
+            ->where('c.userOne = :user OR c.userTwo = :user')
+            ->andWhere('m.isDeleted = false')
+            ->setParameter('user', $user)
+            ->groupBy('c.id');
+
+        $qb->andWhere(
+            $qb->expr()->orX(
+                $qb->expr()->andX(
+                    'c.userOne = :user',
+                    $qb->expr()->orX(
+                        'c.userOneLastSeenAt IS NULL',
+                        'm.createdAt > c.userOneLastSeenAt'
+                    )
+                ),
+                $qb->expr()->andX(
+                    'c.userTwo = :user',
+                    $qb->expr()->orX(
+                        'c.userTwoLastSeenAt IS NULL',
+                        'm.createdAt > c.userTwoLastSeenAt'
+                    )
+                )
+            )
+        );
+
+        $results = $qb->getQuery()->getResult();
+
+        $counts = [];
+        foreach ($results as $result) {
+            $counts[$result['chatId']] = (int) $result['unreadCount'];
+        }
+
+        return $counts;
     }
 }
