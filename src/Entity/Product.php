@@ -65,9 +65,6 @@ class Product
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $recurringFrequency = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $pickingAddress = null;
-
     #[ORM\Column(type: Types::JSON)]
     private array $availabilities = [];
 
@@ -238,18 +235,6 @@ class Product
     public function setRecurringFrequency(?string $recurringFrequency): static
     {
         $this->recurringFrequency = $recurringFrequency;
-
-        return $this;
-    }
-
-    public function getPickingAddress(): ?string
-    {
-        return $this->pickingAddress;
-    }
-
-    public function setPickingAddress(string $pickingAddress): static
-    {
-        $this->pickingAddress = $pickingAddress;
 
         return $this;
     }
