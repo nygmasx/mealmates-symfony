@@ -185,7 +185,7 @@ class UserController extends AbstractController
 
             $this->entityManager->flush();
 
-            return $this->redirect('https://mealmates.testingtest.fr//login');
+            return $this->redirect('https://mealmates.testingtest.fr/login');
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
