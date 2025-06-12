@@ -1,14 +1,16 @@
 nelmio_cors:
     defaults:
-        allow_origin: ['*']
+        allow_credentials: true
+        allow_origin: ['https://mealmates.testingtest.fr', 'http://localhost:5173', 'http://127.0.0.1:5173']
         allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
-        allow_headers: ['Content-Type', 'Authorization', 'X-Requested-With']
+        allow_headers: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin']
         expose_headers: ['Link', 'Location', 'X-Total-Count']
         max_age: 3600
     paths:
-        '^/api/':
-            allow_origin: ['*']
-            allow_headers: ['Content-Type', 'Authorization', 'X-Requested-With']
+        '^/api':
+            allow_credentials: true
+            allow_origin: ['https://mealmates.testingtest.fr', 'http://localhost:5173', 'http://127.0.0.1:5173']
+            allow_headers: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin']
             allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
             max_age: 3600
 
