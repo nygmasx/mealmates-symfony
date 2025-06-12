@@ -105,7 +105,7 @@ class UserController extends AbstractController
             $user,
             Response::HTTP_CREATED,
             [],
-            ['groups' => 'user:read']
+            ['groups' => ['user:read', 'profile:read']]
         );
     }
 
