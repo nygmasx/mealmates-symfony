@@ -38,6 +38,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'price' => 2.99,
                 'user' => $john,
                 'type' => self::TYPE_FOOD,
+                'pickingAddress' => '123 Rue des Pommes, 75001 Paris',
                 'images' => ['/uploads/products/pommes1.jpg', '/uploads/products/pommes2.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
@@ -64,6 +65,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $user,
                 'price' => 1.99,
                 'type' => self::TYPE_FOOD,
+                'pickingAddress' => '45 Avenue des Fruits, 75002 Paris',
                 'images' => ['/uploads/products/bananes1.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
@@ -90,6 +92,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $admin,
                 'price' => 3.50,
                 'type' => self::TYPE_BAKERY,
+                'pickingAddress' => '78 Rue de la Boulangerie, 75003 Paris',
                 'images' => ['/uploads/products/pain1.jpg', '/uploads/products/pain2.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '07:00', 'endTime' => '19:00', 'isEnabled' => true],
@@ -114,6 +117,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $john,
                 'price' => 3.49,
                 'type' => self::TYPE_DAIRY,
+                'pickingAddress' => '12 Place du Marché, 75004 Paris',
                 'images' => ['/uploads/products/yaourt1.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false],
@@ -138,6 +142,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $emma,
                 'price' => 4.25,
                 'type' => self::TYPE_BEVERAGE,
+                'pickingAddress' => '56 Boulevard des Boissons, 75005 Paris',
                 'images' => ['/uploads/products/jus1.jpg', '/uploads/products/jus2.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '08:00', 'endTime' => '20:00', 'isEnabled' => true],
@@ -163,6 +168,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $user2,
                 'price' => 12.99,
                 'type' => self::TYPE_BAKERY,
+                'pickingAddress' => '89 Rue des Desserts, 75006 Paris',
                 'images' => ['/uploads/products/gateau1.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false],
@@ -187,6 +193,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $user3,
                 'price' => 6.50,
                 'type' => self::TYPE_FOOD,
+                'pickingAddress' => '34 Marché Bio, 75007 Paris',
                 'images' => ['/uploads/products/legumes1.jpg', '/uploads/products/legumes2.jpg', '/uploads/products/legumes3.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '06:00', 'endTime' => '14:00', 'isEnabled' => true],
@@ -213,6 +220,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $user4,
                 'price' => 8.99,
                 'type' => self::TYPE_DAIRY,
+                'pickingAddress' => '67 Chemin de la Ferme, 75008 Paris',
                 'images' => ['/uploads/products/fromage1.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => true],
@@ -237,6 +245,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $user5,
                 'price' => 5.25,
                 'type' => self::TYPE_BEVERAGE,
+                'pickingAddress' => '90 Avenue de la Santé, 75009 Paris',
                 'images' => ['/uploads/products/smoothie1.jpg', '/uploads/products/smoothie2.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '07:00', 'endTime' => '15:00', 'isEnabled' => true],
@@ -262,6 +271,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $user6,
                 'price' => 9.50,
                 'type' => self::TYPE_OTHER,
+                'pickingAddress' => '23 Rucher des Abeilles, 75010 Paris',
                 'images' => ['/uploads/products/miel1.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '09:00', 'endTime' => '18:00', 'isEnabled' => false],
@@ -286,6 +296,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $admin,
                 'price' => 0,
                 'type' => self::TYPE_BAKERY,
+                'pickingAddress' => '78 Rue de la Boulangerie, 75003 Paris',
                 'images' => ['/uploads/products/pain_gratuit1.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '18:00', 'endTime' => '19:00', 'isEnabled' => true],
@@ -310,6 +321,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 'user' => $user3,
                 'price' => 0, // Donation
                 'type' => self::TYPE_FOOD,
+                'pickingAddress' => '34 Marché Bio, 75007 Paris',
                 'images' => ['/uploads/products/legumes_don1.jpg'],
                 'availabilities' => [
                     ['day' => 'Lundi', 'startTime' => '17:00', 'endTime' => '18:00', 'isEnabled' => false],
@@ -338,6 +350,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 ->setExpiresAt($productData['expiresAt'])
                 ->setPrice($productData['price'])
                 ->setType($productData['type'])
+                ->setPickingAddress($productData['pickingAddress'])
                 ->setImages(json_encode($productData['images']))
                 ->setAvailabilities($productData['availabilities'])
                 ->setIsRecurring($productData['isRecurring'])
@@ -345,6 +358,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
                 ->setUser($productData['user'])
                 ->setUpdatedAt(new DateTimeImmutable());
 
+            // Ajouter les préférences alimentaires
             foreach ($productData['dietaryPreferences'] as $preferenceReference) {
                 $preference = $this->getReference($preferenceReference, DietaryPreference::class);
                 $product->addDietaryPreference($preference);
