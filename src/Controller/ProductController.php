@@ -366,7 +366,6 @@ final class ProductController extends AbstractController
 
                         $filename = uniqid() . '.' . $file->guessExtension();
 
-                        // Déplacement du fichier (ajustez le chemin selon votre configuration)
                         $uploadDir = $this->getParameter('uploads_directory') . '/products';
                         $file->move($uploadDir, $filename);
 
