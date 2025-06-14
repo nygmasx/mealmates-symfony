@@ -91,6 +91,42 @@ final class ProductController extends AbstractController
 
     #[OA\Response(
         response: 200,
+        description: "Retourne les produits de l'utilisateur authentifié",
+        content: new OA\JsonContent(
+            ref: new Model(type: Product::class, groups: ["product:read"])
+        )
+    )]
+    #[OA\Response(
+        response: 400,
+        description: "Données invalides"
+    )]
+    #[OA\Response(
+        response: 404,
+        description: "Produits non trouvés"
+    )]
+    #[OA\Tag(name: "Products")]
+    #[Security(name: "Bearer")]
+    #[Route('/me', name: 'app_products_me', methods: ['GET'])]
+    public function findByLoggedUser(): JsonResponse
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $products = $this->productRepository->findBy(['user' => $user]);
+
+        return $this->json(
+            $products,
+            Response::HTTP_OK,
+            [],
+            ['groups' => ['product:read', 'user:read', 'preferences:read']]
+        );
+    }
+
+    #[OA\Response(
+        response: 200,
         description: "Retourne les produits d'un utilisateur",
         content: new OA\JsonContent(
             ref: new Model(type: Product::class, groups: ["product:read"])
