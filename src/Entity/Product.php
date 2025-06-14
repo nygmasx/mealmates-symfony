@@ -57,24 +57,31 @@ class Product
     private Collection $orders;
 
     #[ORM\Column]
+    #[Groups(["product:read", "product:write"])]
     private ?int $quantity = null;
 
     #[ORM\Column]
+    #[Groups(["product:read", "product:write"])]
     private ?bool $isRecurring = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["product:read", "product:write"])]
     private ?string $recurringFrequency = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["product:read", "product:write"])]
     private ?string $pickingAddress = null;
 
     #[ORM\Column(type: Types::JSON)]
+    #[Groups(["product:read", "product:write"])]
     private array $availabilities = [];
 
     #[ORM\Column(type: Types::JSON)]
+    #[Groups(["product:read", "product:write"])]
     private array $images = [];
 
     #[ORM\Column]
+    #[Groups(["product:read", "product:write"])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**
