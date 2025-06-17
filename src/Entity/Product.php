@@ -90,8 +90,8 @@ class Product
     #[ORM\OneToMany(targetEntity: Chat::class, mappedBy: 'relatedProduct')]
     private Collection $chats;
 
-    #[ORM\Column]
-    private ?bool $isAlertEnabled = null;
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $isAlertEnabled = false;
 
     #[ORM\Column(nullable: true)]
     private ?int $alertDaysBefore = null;
