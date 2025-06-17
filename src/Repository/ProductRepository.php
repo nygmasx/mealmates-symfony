@@ -205,4 +205,39 @@ class ProductRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findExpiringProducts(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.expirationDate > :startDate')
+            ->andWhere('p.expirationDate <= :endDate')
+            ->andWhere('p.alertEnabled = :alertEnabled')
+            ->andWhere('p.isActive = :isActive')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->setParameter('alertEnabled', true)
+            ->setParameter('isActive', true)
+            ->innerJoin('p.user', 'u')
+            ->addSelect('u')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findUserExpiringProducts($user, int $days = 7): array
+    {
+        $endDate = new \DateTime("+{$days} days");
+
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.user = :user')
+            ->andWhere('p.expirationDate <= :endDate')
+            ->andWhere('p.expirationDate > :now')
+            ->andWhere('p.isActive = :isActive')
+            ->setParameter('user', $user)
+            ->setParameter('endDate', $endDate)
+            ->setParameter('now', new \DateTime())
+            ->setParameter('isActive', true)
+            ->orderBy('p.expirationDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
 }

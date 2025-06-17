@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réservation refusée - Meal Mates</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+        }
+        .header .subtitle {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .rejection-badge {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .booking-info {
+            background: #ffebee;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #f44336;
+        }
+        .booking-number {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .booking-date {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .status-badge {
+            display: inline-block;
+            background: #f44336;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .seller-info {
+            background: #ffebee;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #f44336;
+        }
+        .seller-info h3 {
+            margin: 0 0 10px 0;
+            color: #c62828;
+            font-size: 18px;
+        }
+        .seller-info p {
+            margin: 5px 0;
+            color: #d32f2f;
+        }
+        .products-section {
+            margin: 30px 0;
+        }
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+            opacity: 0.6;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .product-description {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+        .product-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #666;
+        }
+        .encouragement-box {
+            background: #e8f5e8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .encouragement-box h3 {
+            margin: 0 0 15px 0;
+            color: #2E7D32;
+            font-size: 18px;
+        }
+        .encouragement-box p {
+            margin: 0 0 10px 0;
+            color: #388E3C;
+        }
+        .suggestions {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #2196f3;
+        }
+        .suggestions h3 {
+            margin: 0 0 15px 0;
+            color: #1565c0;
+            font-size: 18px;
+        }
+        .suggestions ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .suggestions li {
+            margin-bottom: 8px;
+            color: #1976d2;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        .footer p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .social-links {
+            margin: 20px 0;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #4CAF50;
+            font-size: 18px;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                box-shadow: none;
+            }
+            .header, .content, .footer {
+                padding: 20px 15px;
+            }
+            .product-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>🍽️ Meal Mates</h1>
+        <p class="subtitle">Mise à jour de votre réservation</p>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Rejection Badge -->
+        <div class="rejection-badge">
+            ❌ Votre demande de réservation a été refusée
+        </div>
+
+        <div class="greeting">
+            Bonjour {{ buyerName }},
+        </div>
+
+        <p>Nous sommes désolés de vous informer que <strong>{{ sellerName }}</strong>
+            a refusé votre demande de réservation. Ne vous découragez pas,
+            d'autres excellents produits sont disponibles sur Meal Mates !</p>
+
+        <!-- Booking Info -->
+        <div class="booking-info">
+            <div class="booking-number">
+                <strong>Numéro de réservation :</strong> #{{ booking.id }}
+            </div>
+            <div class="booking-date">
+                <strong>Refusée le :</strong> {{ booking.outdatedAt|date('d/m/Y à H:i') }}
+            </div>
+            <span class="status-badge">❌ Refusée</span>
+        </div>
+
+        <!-- Seller Info -->
+        <div class="seller-info">
+            <h3>👨‍🍳 Vendeur</h3>
+            <p><strong>{{ sellerName }}</strong></p>
+            <p style="font-style: italic;">A refusé votre demande</p>
+        </div>
+
+        <!-- Products Section -->
+        <div class="products-section">
+            <h2 class="section-title">📦 Produits demandés (non disponibles)</h2>
+
+            {% for product in booking.products %}
+                <div class="product-item">
+                    <div class="product-info">
+                        <h3>{{ product.title }}</h3>
+                        {% if product.description %}
+                            <p class="product-description">{{ product.description|slice(0, 100) }}{% if product.description|length > 100 %}...{% endif %}</p>
+                        {% endif %}
+                    </div>
+                    <div class="product-price">
+                        {% if product.price == 0 %}
+                            <span>GRATUIT</span>
+                        {% else %}
+                            {{ product.price|number_format(2, ',', ' ') }}€
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Encouragement Box -->
+        <div class="encouragement-box">
+            <h3>💪 Ne vous découragez pas !</h3>
+            <p>Les refus peuvent avoir diverses raisons : produits déjà vendus,
+                indisponibilité du vendeur, ou simplement un malentendu.</p>
+            <p><strong>Bonne nouvelle :</strong> De nombreux autres vendeurs proposent
+                des produits similaires sur notre plateforme !</p>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="suggestions">
+            <h3>🔍 Nos suggestions</h3>
+            <ul>
+                <li><strong>Recherchez à nouveau :</strong> Explorez d'autres produits similaires</li>
+                <li><strong>Élargissez votre zone :</strong> Augmentez le rayon de recherche</li>
+                <li><strong>Soyez flexible :</strong> Considérez des alternatives équivalentes</li>
+                <li><strong>Réservez rapidement :</strong> Les bons produits partent vite !</li>
+                <li><strong>Contactez le support :</strong> Nous pouvons vous aider à trouver ce que vous cherchez</li>
+            </ul>
+        </div>
+
+        <!-- CTA Button -->
+        <div style="text-align: center;">
+            <a href="https://yoursite.com/search" class="cta-button">
+                🔍 Découvrir d'autres produits
+            </a>
+        </div>
+
+        <p style="margin-top: 30px; color: #666; text-align: center;">
+            <strong>L'équipe Meal Mates est là pour vous aider !</strong><br>
+            N'hésitez pas à nous contacter si vous avez des questions ou besoin d'assistance.
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="social-links">
+            <a href="#" title="Facebook">📘</a>
+            <a href="#" title="Instagram">📷</a>
+            <a href="#" title="Twitter">🐦</a>
+        </div>
+
+        <p><strong>Meal Mates</strong> - Ensemble contre le gaspillage alimentaire</p>
+        <p>
+            <a href="https://yoursite.com">Accueil</a> |
+            <a href="https://yoursite.com/search">Rechercher</a> |
+            <a href="https://yoursite.com/contact">Contact</a>
+        </p>
+        <p style="font-size: 12px; color: #999;">
+            Cet email a été envoyé à {{ booking.user.email }}.<br>
+            Pour gérer vos notifications, <a href="https://yoursite.com/settings">cliquez ici</a>.
+        </p>
+    </div>
+</div>
+</body>
+</html>

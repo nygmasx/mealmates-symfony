@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
@@ -29,10 +30,9 @@ class UserController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface      $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly MailerInterface             $mailer,
         private readonly ValidatorInterface          $validator,
         private readonly UserRepository              $userRepository,
-        private readonly UrlGeneratorInterface       $urlGenerator,
+        private readonly NotificationService         $notificationService,
     )
     {
     }
@@ -96,7 +96,7 @@ class UserController extends AbstractController
         $this->entityManager->flush();
 
         try {
-            $this->sendVerificationEmail($user);
+            $this->notificationService->sendVerificationEmail($user);
         } catch (Throwable $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
@@ -191,27 +191,5 @@ class UserController extends AbstractController
         }
     }
 
-    private function sendVerificationEmail(User $user): void
-    {
-        $verificationUrl = $this->urlGenerator->generate(
-            'app_user_verify',
-            ['token' => $user->getVerificationToken()],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
 
-        $email = new TemplatedEmail()
-            ->from(new Address('sallakimrane@gmail.com', 'Meal Mates'))
-            ->to($user->getEmail())
-            ->subject('Veuillez confirmer votre adresse email')
-            ->htmlTemplate('email/registration.html.twig')
-            ->context([
-                'verificationUrl' => $verificationUrl,
-                'user' => $user,
-            ]);
-
-        $email->getHeaders()
-            ->addTextHeader('X-Mailin-Tag', 'account-verification');
-
-        $this->mailer->send($email);
-    }
 }
