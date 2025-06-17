@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response;
 
-#[Route('/api/bookings')]
+#[Route('/bookings')]
 final class BookingController extends AbstractController
 {
     public function __construct(
