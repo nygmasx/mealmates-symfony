@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle réservation - Meal Mates</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+        }
+        .header .subtitle {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px 20px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .urgent-notice {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa500 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+        .booking-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .booking-number {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .booking-date {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .status-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .buyer-info {
+            background: #e8f5e8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .buyer-info h3 {
+            margin: 0 0 10px 0;
+            color: #2E7D32;
+            font-size: 18px;
+        }
+        .buyer-info p {
+            margin: 5px 0;
+            color: #388E3C;
+        }
+        .products-section {
+            margin: 30px 0;
+        }
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+        .product-description {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+        .product-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #4CAF50;
+        }
+        .total-section {
+            background: #e8f5e8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: right;
+            border-left: 4px solid #4CAF50;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .total-label {
+            font-size: 16px;
+            color: #666;
+        }
+        .total-value {
+            font-size: 16px;
+            color: #333;
+        }
+        .total-final {
+            border-top: 2px solid #4CAF50;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .total-final .total-label {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+        .total-final .total-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+        .action-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-confirm {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            color: white;
+        }
+        .btn-reject {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+        .btn-view {
+            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            color: white;
+            opacity: 0.8;
+        }
+        .deadline-warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .deadline-warning p {
+            margin: 0;
+            color: #92400e;
+            font-weight: 600;
+        }
+        .reminder-box {
+            background: #e8f5e8;
+            border: 1px solid #81C784;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .reminder-box h3 {
+            margin: 0 0 15px 0;
+            color: #2E7D32;
+            font-size: 18px;
+        }
+        .reminder-box ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .reminder-box li {
+            margin-bottom: 8px;
+            color: #388E3C;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        .footer p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .social-links {
+            margin: 20px 0;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #4CAF50;
+            font-size: 18px;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                box-shadow: none;
+            }
+            .header, .content, .footer {
+                padding: 20px 15px;
+            }
+            .product-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .total-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .btn {
+                display: block;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🍽️ Meal Mates</h1>
+        <p class="subtitle">Nouvelle demande de réservation</p>
+    </div>
+
+    <div class="content">
+        <div class="greeting">
+            Bonjour {{ sellerName }},
+        </div>
+
+        <p>Bonne nouvelle ! Vous avez reçu une nouvelle demande de réservation pour vos produits.</p>
+
+        <div class="urgent-notice">
+            ⏰ <strong>ACTION REQUISE :</strong> Vous avez 24h pour répondre à cette demande
+        </div>
+
+        <div class="buyer-info">
+            <h3>👤 Informations de l'acheteur</h3>
+            <p><strong>{{ booking.user.firstName ?? booking.user.name }} {{ booking.user.lastName ?? '' }}</strong></p>
+            {% if booking.user.email %}
+                <p>📧 {{ booking.user.email }}</p>
+            {% endif %}
+            {% if booking.user.phone %}
+                <p>📱 {{ booking.user.phone }}</p>
+            {% endif %}
+        </div>
+
+        <div class="booking-info">
+            <div class="booking-number">
+                <strong>Numéro de réservation :</strong> #{{ booking.id }}
+            </div>
+            <div class="booking-date">
+                <strong>Date de demande :</strong> {{ booking.createdAt|date('d/m/Y à H:i') }}
+            </div>
+            <span class="status-badge">⏳ En attente de votre réponse</span>
+        </div>
+
+        <div class="products-section">
+            <h2 class="section-title">📦 Produits demandés</h2>
+
+            {% for product in booking.products %}
+                <div class="product-item">
+                    <div class="product-info">
+                        <h3>{{ product.title }}</h3>
+                        {% if product.description %}
+                            <p class="product-description">{{ product.description|slice(0, 100) }}{% if product.description|length > 100 %}...{% endif %}</p>
+                        {% endif %}
+                        {% if product.expirationDate %}
+                            <p class="product-description">
+                                <strong>🗓️ Expire le :</strong> {{ product.expirationDate|date('d/m/Y') }}
+                                {% set daysLeft = date().diff(product.expirationDate).days %}
+                                {% if daysLeft <= 1 %}
+                                    <span style="color: #dc2626; font-weight: bold;">⚠️ URGENT</span>
+                                {% elseif daysLeft <= 3 %}
+                                    <span style="color: #f59e0b; font-weight: bold;">⚡ Bientôt</span>
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="product-price">
+                        {% if product.price == 0 %}
+                            <span style="color: #10b981;">GRATUIT</span>
+                        {% else %}
+                            {{ product.price|number_format(2, ',', ' ') }}€
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="total-section">
+            <div class="total-row">
+                <span class="total-label">Nombre d'articles :</span>
+                <span class="total-value">{{ booking.products|length }}</span>
+            </div>
+            {% if booking.totalPrice > 0 %}
+                <div class="total-row">
+                    <span class="total-label">Montant total :</span>
+                    <span class="total-value">{{ booking.totalPrice|number_format(2, ',', ' ') }}€</span>
+                </div>
+            {% endif %}
+            <div class="total-row total-final">
+                <span class="total-label">Gain potentiel :</span>
+                <span class="total-value">
+                    {% if booking.totalPrice == 0 %}
+                        Satisfaction 😊
+                    {% else %}
+                        {{ booking.totalPrice|number_format(2, ',', ' ') }}€ 💰
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="deadline-warning">
+            <p>⏰ Cette demande expire automatiquement dans 24h si vous ne répondez pas</p>
+        </div>
+
+        <div class="action-buttons">
+            <a href="https://yoursite.com/bookings/{{ booking.id }}/confirm" class="btn btn-confirm">
+                ✅ Confirmer la réservation
+            </a>
+            <a href="https://yoursite.com/bookings/{{ booking.id }}/reject" class="btn btn-reject">
+                ❌ Refuser la demande
+            </a>
+            <br>
+            <a href="https://yoursite.com/bookings/{{ booking.id }}" class="btn btn-view">
+                👁️ Voir les détails
+            </a>
+        </div>
+
+        <div class="reminder-box">
+            <h3>💡 Rappels importants</h3>
+            <ul>
+                <li><strong>Confirmation :</strong> En confirmant, vous vous engagez à remettre les produits</li>
+                <li><strong>Contact :</strong> Vous pourrez ensuite organiser le rendez-vous directement avec l'acheteur</li>
+                <li><strong>Paiement :</strong> Le règlement se fait en main propre lors de la remise</li>
+                <li><strong>Qualité :</strong> Assurez-vous que vos produits sont toujours en bon état</li>
+                {% if booking.products|first.expirationDate %}
+                    {% set product = booking.products|first %}
+                    {% set daysLeft = date().diff(product.expirationDate).days %}
+                    {% if daysLeft <= 2 %}
+                        <li style="color: #dc2626;"><strong>⚠️ Urgence :</strong> Certains produits expirent très bientôt !</li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+        </div>
+
+        <p style="margin-top: 30px; color: #666; text-align: center;">
+            <strong>Merci de répondre rapidement pour maintenir une bonne expérience utilisateur.</strong><br>
+            En cas de question, contactez-nous via l'application.
+        </p>
+    </div>
+
+    <div class="footer">
+        <div class="social-links">
+            <a href="#" title="Facebook">📘</a>
+            <a href="#" title="Instagram">📷</a>
+            <a href="#" title="Twitter">🐦</a>
+        </div>
+
+        <p><strong>Meal Mates</strong> - Ensemble contre le gaspillage alimentaire</p>
+        <p>
+            <a href="https://yoursite.com">Accueil</a> |
+            <a href="https://yoursite.com/seller-dashboard">Tableau de bord vendeur</a> |
+            <a href="https://yoursite.com/contact">Contact</a>
+        </p>
+        <p style="font-size: 12px; color: #999;">
+            Cet email a été envoyé à {{ booking.products|first.user.email }}.<br>
+            Pour gérer vos notifications, <a href="https://yoursite.com/settings">cliquez ici</a>.
+        </p>
+    </div>
+</div>
+</body>
+</html>

@@ -90,11 +90,37 @@ class Product
     #[ORM\OneToMany(targetEntity: Chat::class, mappedBy: 'relatedProduct')]
     private Collection $chats;
 
+    #[ORM\Column]
+    private ?bool $isAlertEnabled = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $alertDaysBefore = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $lastAlertSentAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $alertCount = null;
+
+    /**
+     * @var Collection<int, Notification>
+     */
+    #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'product')]
+    private Collection $notifications;
+
+    /**
+     * @var Collection<int, Booking>
+     */
+    #[ORM\ManyToMany(targetEntity: Booking::class, mappedBy: 'products')]
+    private Collection $bookings;
+
     public function __construct()
     {
         $this->dietaryPreferences = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->chats = new ArrayCollection();
+        $this->notifications = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -364,6 +390,111 @@ class Product
             if ($chat->getRelatedProduct() === $this) {
                 $chat->setRelatedProduct(null);
             }
+        }
+
+        return $this;
+    }
+
+    public function isAlertEnabled(): ?bool
+    {
+        return $this->isAlertEnabled;
+    }
+
+    public function setIsAlertEnabled(bool $isAlertEnabled): static
+    {
+        $this->isAlertEnabled = $isAlertEnabled;
+
+        return $this;
+    }
+
+    public function getAlertDaysBefore(): ?int
+    {
+        return $this->alertDaysBefore;
+    }
+
+    public function setAlertDaysBefore(?int $alertDaysBefore): static
+    {
+        $this->alertDaysBefore = $alertDaysBefore;
+
+        return $this;
+    }
+
+    public function getLastAlertSentAt(): ?\DateTimeImmutable
+    {
+        return $this->lastAlertSentAt;
+    }
+
+    public function setLastAlertSentAt(?\DateTimeImmutable $lastAlertSentAt): static
+    {
+        $this->lastAlertSentAt = $lastAlertSentAt;
+
+        return $this;
+    }
+
+    public function getAlertCount(): ?int
+    {
+        return $this->alertCount;
+    }
+
+    public function setAlertCount(?int $alertCount): static
+    {
+        $this->alertCount = $alertCount;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Notification>
+     */
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
+
+    public function addNotification(Notification $notification): static
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): static
+    {
+        if ($this->notifications->removeElement($notification)) {
+            // set the owning side to null (unless already changed)
+            if ($notification->getProduct() === $this) {
+                $notification->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
+            $booking->addProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): static
+    {
+        if ($this->bookings->removeElement($booking)) {
+            $booking->removeProduct($this);
         }
 
         return $this;

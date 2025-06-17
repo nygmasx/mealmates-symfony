@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Alerte d'expiration - {{ product.title }}</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center;">
+    <h1 style="color: white; margin: 0;">
+        {% if daysUntilExpiration == 0 %}
+            🚨 Action immédiate requise
+        {% elseif daysUntilExpiration == 1 %}
+            ⚠️ Alerte expiration
+        {% else %}
+            📅 Rappel d'expiration
+        {% endif %}
+    </h1>
+</div>
+
+<div style="padding: 30px;">
+    <p>Bonjour {{ user.firstName ?? user.name }},</p>
+
+    <div style="background: {% if urgencyLevel == 'critical' %}#fee2e2{% elseif urgencyLevel == 'urgent' %}#fef3c7{% else %}#f3f4f6{% endif %}; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2 style="margin-top: 0; color: {% if urgencyLevel == 'critical' %}#dc2626{% elseif urgencyLevel == 'urgent' %}#d97706{% else %}#374151{% endif %};">
+            {{ product.title }}
+        </h2>
+
+        {% if daysUntilExpiration == 0 %}
+            <p><strong>⏰ Expire aujourd'hui !</strong></p>
+            <p>Votre produit expire aujourd'hui. Pour éviter le gaspillage, nous vous recommandons de le passer en don gratuit immédiatement.</p>
+        {% elseif daysUntilExpiration == 1 %}
+            <p><strong>⏰ Expire demain</strong></p>
+            <p>Votre produit expire dans moins de 24h. Vous pouvez encore le vendre à prix réduit ou le convertir en don gratuit.</p>
+        {% else %}
+            <p><strong>⏰ Expire dans {{ daysUntilExpiration }} jours</strong></p>
+            <p>Il est temps de penser à ajuster votre stratégie pour ce produit.</p>
+        {% endif %}
+
+        {% if product.price > 0 %}
+            <p><strong>Prix actuel :</strong> {{ product.price }}€</p>
+        {% else %}
+            <p><strong>Statut :</strong> Don gratuit</p>
+        {% endif %}
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ editUrl }}" style="background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+            ✏️ Modifier mon produit
+        </a>
+    </div>
+
+    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h3>💡 Actions recommandées :</h3>
+        <ul>
+            {% if product.price > 0 %}
+                <li><strong>Réduire le prix</strong> pour accélérer la vente</li>
+                <li><strong>Passer en don gratuit</strong> pour éviter le gaspillage</li>
+            {% endif %}
+            <li><strong>Mettre en avant</strong> dans votre vitrine</li>
+            <li><strong>Contacter directement</strong> vos clients réguliers</li>
+        </ul>
+    </div>
+
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+
+    <p style="font-size: 14px; color: #6b7280;">
+        Vous recevez cette alerte car vous avez activé les notifications d'expiration.
+        <a href="{{ path('user_preferences') }}">Gérer mes préférences de notification</a>
+    </p>
+</div>
+</body>
+</html>
