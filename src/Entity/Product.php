@@ -103,12 +103,6 @@ class Product
     private ?int $alertCount = null;
 
     /**
-     * @var Collection<int, Notification>
-     */
-    #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'product')]
-    private Collection $notifications;
-
-    /**
      * @var Collection<int, Booking>
      */
     #[ORM\ManyToMany(targetEntity: Booking::class, mappedBy: 'products')]
@@ -119,7 +113,6 @@ class Product
         $this->dietaryPreferences = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->chats = new ArrayCollection();
-        $this->notifications = new ArrayCollection();
         $this->bookings = new ArrayCollection();
     }
 
@@ -439,36 +432,6 @@ class Product
     public function setAlertCount(?int $alertCount): static
     {
         $this->alertCount = $alertCount;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Notification>
-     */
-    public function getNotifications(): Collection
-    {
-        return $this->notifications;
-    }
-
-    public function addNotification(Notification $notification): static
-    {
-        if (!$this->notifications->contains($notification)) {
-            $this->notifications->add($notification);
-            $notification->setProduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNotification(Notification $notification): static
-    {
-        if ($this->notifications->removeElement($notification)) {
-            // set the owning side to null (unless already changed)
-            if ($notification->getProduct() === $this) {
-                $notification->setProduct(null);
-            }
-        }
 
         return $this;
     }
