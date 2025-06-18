@@ -33,7 +33,7 @@ final class BookingController extends AbstractController
     #[OA\RequestBody(
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: "product_ids", type: "array", items: new OA\Items(type: "integer")),
+                new OA\Property(property: "product_ids", type: "array", items: new OA\Items(type: "string")),
             ],
             type: "object"
         )
