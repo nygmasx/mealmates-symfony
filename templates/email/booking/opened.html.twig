@@ -279,24 +279,24 @@
         <div class="products-section">
             <h2 class="section-title">📦 Produits réservés</h2>
 
-            {% for product in booking.products %}
+
                 <div class="product-item">
                     <div class="product-info">
-                        <h3>{{ product.title }}</h3>
-                        {% if product.description %}
-                            <p class="product-description">{{ product.description|slice(0, 100) }}{% if product.description|length > 100 %}...{% endif %}</p>
+                        <h3>{{ booking.product.title }}</h3>
+                        {% if booking.product.description %}
+                            <p class="product-description">{{ booking.product.description|slice(0, 100) }}{% if booking.product.description|length > 100 %}...{% endif %}</p>
                         {% endif %}
-                        {% if product.expirationDate %}
+                        {% if booking.product.expirationDate %}
                             <p class="product-description">
-                                <strong>🗓️ Expire le :</strong> {{ product.expirationDate|date('d/m/Y') }}
+                                <strong>🗓️ Expire le :</strong> {{ booking.product.expirationDate|date('d/m/Y') }}
                             </p>
                         {% endif %}
                     </div>
                     <div class="product-price">
-                        {% if product.price == 0 %}
+                        {% if booking.product.price == 0 %}
                             <span style="color: #10b981;">GRATUIT</span>
                         {% else %}
-                            {{ product.price|number_format(2, ',', ' ') }}€
+                            {{ booking.product.price|number_format(2, ',', ' ') }}€
                         {% endif %}
                     </div>
                 </div>
@@ -307,7 +307,7 @@
         <div class="total-section">
             <div class="total-row">
                 <span class="total-label">Nombre d'articles :</span>
-                <span class="total-value">{{ booking.products|length }}</span>
+                <span class="total-value">{{ booking.product|length }}</span>
             </div>
             {% if booking.totalPrice > 0 %}
                 <div class="total-row">
@@ -328,7 +328,7 @@
         </div>
 
         <!-- Seller Info -->
-        {% set seller = booking.products|first.user %}
+        {% set seller = booking.product.user %}
         <div class="seller-info">
             <h3>👨‍🍳 Votre vendeur</h3>
             <p><strong>{{ seller.firstName ?? seller.name }}</strong></p>
