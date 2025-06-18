@@ -19,12 +19,6 @@ class Booking
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
     private ?Uuid $id = null;
 
-    /**
-     * @var Collection<int, Product>
-     */
-    #[ORM\ManyToMany(targetEntity: Product::class, inversedBy: 'bookings')]
-    private Collection $products;
-
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     private ?User $user = null;
 
@@ -46,38 +40,17 @@ class Booking
     #[ORM\Column]
     private ?float $totalPrice = null;
 
+    #[ORM\ManyToOne(inversedBy: 'bookings')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Product $product = null;
+
     public function __construct()
     {
-        $this->products = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
-    }
-
-    /**
-     * @return Collection<int, Product>
-     */
-    public function getProducts(): Collection
-    {
-        return $this->products;
-    }
-
-    public function addProduct(Product $product): static
-    {
-        if (!$this->products->contains($product)) {
-            $this->products->add($product);
-        }
-
-        return $this;
-    }
-
-    public function removeProduct(Product $product): static
-    {
-        $this->products->removeElement($product);
-
-        return $this;
     }
 
     public function getUser(): ?User
@@ -160,6 +133,18 @@ class Booking
     public function setTotalPrice(float $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
+
+    public function setProduct(?Product $product): static
+    {
+        $this->product = $product;
 
         return $this;
     }

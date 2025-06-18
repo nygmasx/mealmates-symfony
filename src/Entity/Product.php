@@ -105,7 +105,7 @@ class Product
     /**
      * @var Collection<int, Booking>
      */
-    #[ORM\ManyToMany(targetEntity: Booking::class, mappedBy: 'products')]
+    #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'product')]
     private Collection $bookings;
 
     public function __construct()
@@ -448,7 +448,7 @@ class Product
     {
         if (!$this->bookings->contains($booking)) {
             $this->bookings->add($booking);
-            $booking->addProduct($this);
+            $booking->setProduct($this);
         }
 
         return $this;
@@ -457,7 +457,10 @@ class Product
     public function removeBooking(Booking $booking): static
     {
         if ($this->bookings->removeElement($booking)) {
-            $booking->removeProduct($this);
+            // set the owning side to null (unless already changed)
+            if ($booking->getProduct() === $this) {
+                $booking->setProduct(null);
+            }
         }
 
         return $this;
