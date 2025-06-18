@@ -33,7 +33,7 @@ final class BookingController extends AbstractController
     #[OA\RequestBody(
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: "product_ids", type: "array", items: new OA\Items(type: "string")),
+                new OA\Property(property: "product_id", type: "string"),
             ],
             type: "object"
         )
@@ -57,63 +57,39 @@ final class BookingController extends AbstractController
 
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['product_ids']) || empty($data['product_ids'])) {
-            return new JsonResponse(['message' => 'Au moins un produit doit être sélectionné'], Response::HTTP_BAD_REQUEST);
+        if (!isset($data['product_id']) || empty($data['product_id'])) {
+            return new JsonResponse(['message' => 'Un produit doit être sélectionné'], Response::HTTP_BAD_REQUEST);
         }
 
         try {
 
-            $products = $this->productRepository->findBy(['id' => $data['product_ids']]);
+            $product = $this->productRepository->find($data['product_id']);
 
-            if (count($products) !== count($data['product_ids'])) {
-                return new JsonResponse(['message' => 'Un ou plusieurs produits sont introuvables'], Response::HTTP_BAD_REQUEST);
+            if (!$product) {
+                return new JsonResponse(['message' => 'Produit introuvable'], Response::HTTP_BAD_REQUEST);
             }
 
-
-            $seller = null;
-            $totalPrice = 0;
-
-            foreach ($products as $product) {
-
-                if (!$product->isActive()) {
-                    return new JsonResponse([
-                        'message' => "Le produit '{$product->getTitle()}' n'est plus disponible"
-                    ], Response::HTTP_BAD_REQUEST);
-                }
-
-                if ($product->getUser() === $user) {
-                    return new JsonResponse([
-                        'message' => 'Vous ne pouvez pas réserver vos propres produits'
-                    ], Response::HTTP_BAD_REQUEST);
-                }
-
-                if ($seller === null) {
-                    $seller = $product->getUser();
-                } elseif ($seller !== $product->getUser()) {
-                    return new JsonResponse([
-                        'message' => 'Tous les produits doivent appartenir au même vendeur'
-                    ], Response::HTTP_BAD_REQUEST);
-                }
-
-                if ($this->hasActiveBooking($product, $user)) {
-                    return new JsonResponse([
-                        'message' => "Vous avez déjà une réservation active pour '{$product->getTitle()}'"
-                    ], Response::HTTP_BAD_REQUEST);
-                }
-
-                $totalPrice += $product->getPrice();
+            if ($product->getUser() === $user) {
+                return new JsonResponse([
+                    'message' => 'Vous ne pouvez pas réserver vos propres produits'
+                ], Response::HTTP_BAD_REQUEST);
             }
+
+            if ($this->hasActiveBooking($product, $user)) {
+                return new JsonResponse([
+                    'message' => "Vous avez déjà une réservation active pour '{$product->getTitle()}'"
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $totalPrice = $product->getPrice();
 
             $booking = new Booking();
             $booking->setUser($user)
                 ->setCreatedAt(new \DateTimeImmutable())
                 ->setIsConfirmed(false)
                 ->setIsOutdated(false)
-                ->setTotalPrice($totalPrice);
-
-            foreach ($products as $product) {
-                $booking->addProduct($product);
-            }
+                ->setTotalPrice($totalPrice)
+                ->setProduct($product);
 
             $this->entityManager->persist($booking);
             $this->entityManager->flush();
@@ -123,11 +99,11 @@ final class BookingController extends AbstractController
 
             return new JsonResponse([
                 'id' => $booking->getId(),
-                'products' => array_map(fn($p) => [
-                    'id' => $p->getId(),
-                    'title' => $p->getTitle(),
-                    'price' => $p->getPrice()
-                ], $booking->getProducts()->toArray()),
+                'product' => [
+                    'id' => $booking->getProduct()->getId(),
+                    'title' => $booking->getProduct()->getTitle(),
+                    'price' => $booking->getProduct()->getPrice()
+                ],
                 'total_price' => $booking->getTotalPrice(),
                 'created_at' => $booking->getCreatedAt()->format('c'),
                 'is_confirmed' => $booking->isConfirmed(),
@@ -158,7 +134,12 @@ final class BookingController extends AbstractController
 
         $myBookings = $this->bookingRepository->findBy(['user' => $user]);
 
-        $sellerBookings = $this->bookingRepository->findBookingsForSeller($user);
+        $sellerBookings = $this->bookingRepository->createQueryBuilder('b')
+            ->join('b.product', 'p')
+            ->where('p.user = :seller')
+            ->setParameter('seller', $user)
+            ->getQuery()
+            ->getResult();
 
         $allBookings = array_merge($myBookings, $sellerBookings);
 
@@ -167,14 +148,14 @@ final class BookingController extends AbstractController
 
             return [
                 'id' => $booking->getId(),
-                'products' => array_map(fn($p) => [
-                    'id' => $p->getId(),
-                    'title' => $p->getTitle(),
-                    'price' => $p->getPrice()
-                ], $booking->getProducts()->toArray()),
+                'product' => [
+                    'id' => $booking->getProduct()->getId(),
+                    'title' => $booking->getProduct()->getTitle(),
+                    'price' => $booking->getProduct()->getPrice()
+                ],
                 'buyer' => [
                     'id' => $booking->getUser()->getId(),
-                    'name' => $booking->getUser()->getFirstName() ?? $booking->getUser()->getName()
+                    'name' => $booking->getUser()->getFirstName() ?? $booking->getUser()->getLastName()
                 ],
                 'total_price' => $booking->getTotalPrice(),
                 'created_at' => $booking->getCreatedAt()->format('c'),
@@ -288,19 +269,26 @@ final class BookingController extends AbstractController
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $pendingBookings = $this->bookingRepository->findPendingForSeller($user);
+        $pendingBookings = $this->bookingRepository->createQueryBuilder('b')
+            ->join('b.product', 'p')
+            ->where('p.user = :seller')
+            ->andWhere('b.isConfirmed = false')
+            ->andWhere('b.isOutdated = false')
+            ->setParameter('seller', $user)
+            ->getQuery()
+            ->getResult();
 
         $bookingsData = array_map(function($booking) {
             return [
                 'id' => $booking->getId(),
-                'products' => array_map(fn($p) => [
-                    'id' => $p->getId(),
-                    'title' => $p->getTitle(),
-                    'price' => $p->getPrice()
-                ], $booking->getProducts()->toArray()),
+                'product' => [
+                    'id' => $booking->getProduct()->getId(),
+                    'title' => $booking->getProduct()->getTitle(),
+                    'price' => $booking->getProduct()->getPrice()
+                ],
                 'buyer' => [
                     'id' => $booking->getUser()->getId(),
-                    'name' => $booking->getUser()->getFirstName() ?? $booking->getUser()->getName()
+                    'name' => $booking->getUser()->getFirstName() ?? $booking->getUser()->getLastName()
                 ],
                 'total_price' => $booking->getTotalPrice(),
                 'created_at' => $booking->getCreatedAt()->format('c'),
@@ -392,25 +380,25 @@ final class BookingController extends AbstractController
         }
 
         $isSellerView = $this->isUserSeller($booking, $user);
-        $seller = $booking->getProducts()->first()->getUser();
+        $seller = $booking->getProduct()->getUser();
 
         return new JsonResponse([
             'id' => $booking->getId(),
-            'products' => array_map(fn($p) => [
-                'id' => $p->getId(),
-                'title' => $p->getTitle(),
-                'description' => $p->getDescription(),
-                'price' => $p->getPrice(),
-                'expiration_date' => $p->getExpirationDate()?->format('c')
-            ], $booking->getProducts()->toArray()),
+            'product' => [
+                'id' => $booking->getProduct()->getId(),
+                'title' => $booking->getProduct()->getTitle(),
+                'type' => $booking->getProduct()->getType(),
+                'price' => $booking->getProduct()->getPrice(),
+                'expires_at' => $booking->getProduct()->getExpiresAt()?->format('c')
+            ],
             'buyer' => [
                 'id' => $booking->getUser()->getId(),
-                'name' => $booking->getUser()->getFirstName() ?? $booking->getUser()->getName(),
+                'name' => $booking->getUser()->getFirstName() ?? $booking->getUser()->getLastName(),
                 'email' => $isSellerView ? $booking->getUser()->getEmail() : null
             ],
             'seller' => [
                 'id' => $seller->getId(),
-                'name' => $seller->getFirstName() ?? $seller->getName(),
+                'name' => $seller->getFirstName() ?? $seller->getLastName(),
                 'email' => !$isSellerView ? $seller->getEmail() : null
             ],
             'total_price' => $booking->getTotalPrice(),
@@ -427,7 +415,6 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    // Méthodes privées utilitaires
 
     private function hasActiveBooking(Product $product, User $buyer): bool
     {
@@ -443,12 +430,7 @@ final class BookingController extends AbstractController
 
     private function isUserSeller(Booking $booking, User $user): bool
     {
-        foreach ($booking->getProducts() as $product) {
-            if ($product->getUser() === $user) {
-                return true;
-            }
-        }
-        return false;
+        return $booking->getProduct()->getUser() === $user;
     }
 
     private function getHoursSinceCreation(Booking $booking): int
