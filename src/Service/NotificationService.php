@@ -59,11 +59,11 @@ class NotificationService
     public function sendBookingOpenedToSellerMail(Booking $booking): void
     {
         $userName = $booking->getUser()->getFirstName() . ' ' . $booking->getUser()->getLastName();
-        $sellerName = $booking->getProducts()->first()->getUser()->getFirstName() . ' ' . $booking->getProducts()->first()->getUser()->getLastName();
+        $sellerName = $booking->getProduct()->getUser()->getFirstName() . ' ' . $booking->getProduct()->getUser()->getLastName();
 
         $email = new TemplatedEmail()
             ->from(new Address('sallakimrane@gmail.com', 'Meal Mates'))
-            ->to($booking->getProducts()->first()->getUser()->getEmail())
+            ->to($booking->getProduct()->getUser()->getEmail())
             ->subject("Nouvelle réservation de {$userName}.")
             ->htmlTemplate('email/booking/opened_to_seller.html.twig')
             ->context([
@@ -79,7 +79,7 @@ class NotificationService
 
     public function sendBookingConfirmationNotification(Booking $booking): void
     {
-        $seller = $booking->getProducts()->first()->getUser();
+        $seller = $booking->getProduct()->getUser();
         $sellerName = $seller->getFirstName() . ' ' . $seller->getLastName();
         $buyerName = $booking->getUser()->getFirstName() . ' ' . $booking->getUser()->getLastName();
 
@@ -102,7 +102,7 @@ class NotificationService
 
     public function sendBookingRejectionNotification(Booking $booking): void
     {
-        $seller = $booking->getProducts()->first()->getUser();
+        $seller = $booking->getProduct()->getUser();
         $sellerName = $seller->getFirstName() . ' ' . $seller->getLastName();
         $buyerName = $booking->getUser()->getFirstName() . ' ' . $booking->getUser()->getLastName();
 
@@ -125,7 +125,7 @@ class NotificationService
 
     public function sendBookingExpirationNotification(Booking $booking): void
     {
-        $seller = $booking->getProducts()->first()->getUser();
+        $seller = $booking->getProduct()->getUser();
         $sellerName = $seller->getFirstName() . ' ' . $seller->getLastName();
         $buyerName = $booking->getUser()->getFirstName() . ' ' . $booking->getUser()->getLastName();
 
@@ -149,7 +149,7 @@ class NotificationService
 
     public function sendBookingCancellationNotification(Booking $booking): void
     {
-        $seller = $booking->getProducts()->first()->getUser();
+        $seller = $booking->getProduct()->getUser();
         $buyer = $booking->getUser();
 
         $email = new TemplatedEmail()
