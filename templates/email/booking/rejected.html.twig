@@ -269,23 +269,19 @@
         <div class="products-section">
             <h2 class="section-title">📦 Produits demandés (non disponibles)</h2>
 
-            {% for product in booking.products %}
-                <div class="product-item">
-                    <div class="product-info">
-                        <h3>{{ product.title }}</h3>
-                        {% if product.description %}
-                            <p class="product-description">{{ product.description|slice(0, 100) }}{% if product.description|length > 100 %}...{% endif %}</p>
-                        {% endif %}
-                    </div>
-                    <div class="product-price">
-                        {% if product.price == 0 %}
-                            <span>GRATUIT</span>
-                        {% else %}
-                            {{ product.price|number_format(2, ',', ' ') }}€
-                        {% endif %}
-                    </div>
+            <div class="product-item">
+                <div class="product-info">
+                    <h3>{{ booking.product.title }}</h3>
+                    <p class="product-description">Type: {{ booking.product.type }}</p>
                 </div>
-            {% endfor %}
+                <div class="product-price">
+                    {% if booking.product.price == 0 %}
+                        <span>GRATUIT</span>
+                    {% else %}
+                        {{ booking.product.price|number_format(2, ',', ' ') }}€
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
         <!-- Encouragement Box -->

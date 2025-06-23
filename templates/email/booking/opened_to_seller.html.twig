@@ -302,9 +302,6 @@
             {% if booking.user.email %}
                 <p>📧 {{ booking.user.email }}</p>
             {% endif %}
-            {% if booking.user.phone %}
-                <p>📱 {{ booking.user.phone }}</p>
-            {% endif %}
         </div>
 
         <div class="booking-info">
@@ -320,40 +317,36 @@
         <div class="products-section">
             <h2 class="section-title">📦 Produits demandés</h2>
 
-            {% for product in booking.products %}
-                <div class="product-item">
-                    <div class="product-info">
-                        <h3>{{ product.title }}</h3>
-                        {% if product.description %}
-                            <p class="product-description">{{ product.description|slice(0, 100) }}{% if product.description|length > 100 %}...{% endif %}</p>
-                        {% endif %}
-                        {% if product.expirationDate %}
-                            <p class="product-description">
-                                <strong>🗓️ Expire le :</strong> {{ product.expirationDate|date('d/m/Y') }}
-                                {% set daysLeft = date().diff(product.expirationDate).days %}
-                                {% if daysLeft <= 1 %}
-                                    <span style="color: #dc2626; font-weight: bold;">⚠️ URGENT</span>
-                                {% elseif daysLeft <= 3 %}
-                                    <span style="color: #f59e0b; font-weight: bold;">⚡ Bientôt</span>
-                                {% endif %}
-                            </p>
-                        {% endif %}
-                    </div>
-                    <div class="product-price">
-                        {% if product.price == 0 %}
-                            <span style="color: #10b981;">GRATUIT</span>
-                        {% else %}
-                            {{ product.price|number_format(2, ',', ' ') }}€
-                        {% endif %}
-                    </div>
+            <div class="product-item">
+                <div class="product-info">
+                    <h3>{{ booking.product.title }}</h3>
+                    <p class="product-description">Type: {{ booking.product.type }}</p>
+                    {% if booking.product.expiresAt %}
+                        <p class="product-description">
+                            <strong>🗓️ Expire le :</strong> {{ booking.product.expiresAt|date('d/m/Y') }}
+                            {% set daysLeft = date().diff(booking.product.expiresAt).days %}
+                            {% if daysLeft <= 1 %}
+                                <span style="color: #dc2626; font-weight: bold;">⚠️ URGENT</span>
+                            {% elseif daysLeft <= 3 %}
+                                <span style="color: #f59e0b; font-weight: bold;">⚡ Bientôt</span>
+                            {% endif %}
+                        </p>
+                    {% endif %}
                 </div>
-            {% endfor %}
+                <div class="product-price">
+                    {% if booking.product.price == 0 %}
+                        <span style="color: #10b981;">GRATUIT</span>
+                    {% else %}
+                        {{ booking.product.price|number_format(2, ',', ' ') }}€
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
         <div class="total-section">
             <div class="total-row">
                 <span class="total-label">Nombre d'articles :</span>
-                <span class="total-value">{{ booking.products|length }}</span>
+                <span class="total-value">{{ booking.product|length }}</span>
             </div>
             {% if booking.totalPrice > 0 %}
                 <div class="total-row">
@@ -397,9 +390,9 @@
                 <li><strong>Contact :</strong> Vous pourrez ensuite organiser le rendez-vous directement avec l'acheteur</li>
                 <li><strong>Paiement :</strong> Le règlement se fait en main propre lors de la remise</li>
                 <li><strong>Qualité :</strong> Assurez-vous que vos produits sont toujours en bon état</li>
-                {% if booking.products|first.expirationDate %}
-                    {% set product = booking.products|first %}
-                    {% set daysLeft = date().diff(product.expirationDate).days %}
+                {% if booking.product.expiresAt %}
+                    {% set product = booking.product %}
+                    {% set daysLeft = date().diff(product.expiresAt).days %}
                     {% if daysLeft <= 2 %}
                         <li style="color: #dc2626;"><strong>⚠️ Urgence :</strong> Certains produits expirent très bientôt !</li>
                     {% endif %}
@@ -427,7 +420,7 @@
             <a href="https://yoursite.com/contact">Contact</a>
         </p>
         <p style="font-size: 12px; color: #999;">
-            Cet email a été envoyé à {{ booking.products|first.user.email }}.<br>
+            Cet email a été envoyé à {{ booking.product.user.email }}.<br>
             Pour gérer vos notifications, <a href="https://yoursite.com/settings">cliquez ici</a>.
         </p>
     </div>
