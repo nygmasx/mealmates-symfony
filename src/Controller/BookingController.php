@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\Chat;
 use App\Entity\Product;
 use App\Entity\User;
 use App\Repository\BookingRepository;
@@ -23,12 +24,14 @@ use Symfony\Component\HttpFoundation\Response;
 final class BookingController extends AbstractController
 {
     public function __construct(
-        private readonly BookingRepository $bookingRepository,
-        private readonly ProductRepository $productRepository,
+        private readonly BookingRepository      $bookingRepository,
+        private readonly ProductRepository      $productRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly NotificationService $notificationService,
-        private readonly SerializerInterface $serializer
-    ) {}
+        private readonly NotificationService    $notificationService,
+        private readonly SerializerInterface    $serializer
+    )
+    {
+    }
 
     #[OA\RequestBody(
         content: new OA\JsonContent(
@@ -91,7 +94,18 @@ final class BookingController extends AbstractController
                 ->setTotalPrice($totalPrice)
                 ->setProduct($product);
 
+            $chat = new Chat();
+            $chat->setCreatedAt(new \DateTimeImmutable())
+                ->setUpdatedAt(new \DateTimeImmutable())
+                ->setRelatedProduct($product)
+                ->setUserOne($user)
+                ->setUserTwo($product->getUser())
+                ->setBooking($booking);
+
+            $booking->setChat($chat);
+
             $this->entityManager->persist($booking);
+            $this->entityManager->persist($chat);
             $this->entityManager->flush();
 
             $this->notificationService->sendBookingOpenedMail($booking);
@@ -143,7 +157,7 @@ final class BookingController extends AbstractController
 
         $allBookings = array_merge($myBookings, $sellerBookings);
 
-        $bookingsData = array_map(function($booking) use ($user) {
+        $bookingsData = array_map(function ($booking) use ($user) {
             $isSellerView = $this->isUserSeller($booking, $user);
 
             return [
@@ -278,7 +292,7 @@ final class BookingController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        $bookingsData = array_map(function($booking) {
+        $bookingsData = array_map(function ($booking) {
             return [
                 'id' => $booking->getId(),
                 'product' => [
