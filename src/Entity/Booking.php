@@ -44,6 +44,9 @@ class Booking
     #[ORM\JoinColumn(nullable: false)]
     private ?Product $product = null;
 
+    #[ORM\OneToOne(mappedBy: 'booking', cascade: ['persist', 'remove'])]
+    private ?Chat $chat = null;
+
     public function __construct()
     {
     }
@@ -145,6 +148,26 @@ class Booking
     public function setProduct(?Product $product): static
     {
         $this->product = $product;
+
+        return $this;
+    }
+
+    public function getChat(): ?Chat
+    {
+        return $this->chat;
+    }
+
+    public function setChat(?Chat $chat): static
+    {
+        if ($chat === null && $this->chat !== null) {
+            $this->chat->setBooking(null);
+        }
+
+        if ($chat !== null && $chat->getBooking() !== $this) {
+            $chat->setBooking($this);
+        }
+
+        $this->chat = $chat;
 
         return $this;
     }

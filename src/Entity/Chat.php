@@ -59,6 +59,11 @@ class Chat
     #[Groups(['chat:read'])]
     private ?\DateTimeImmutable $userTwoLastSeenAt = null;
 
+    #[ORM\OneToOne(inversedBy: 'chat')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['chat:read'])]
+    private ?Booking $booking = null;
+
     public function __construct()
     {
         $this->messages = new ArrayCollection();
@@ -179,6 +184,18 @@ class Chat
     public function setUserTwoLastSeenAt(?\DateTimeImmutable $userTwoLastSeenAt): static
     {
         $this->userTwoLastSeenAt = $userTwoLastSeenAt;
+
+        return $this;
+    }
+
+    public function getBooking(): ?Booking
+    {
+        return $this->booking;
+    }
+
+    public function setBooking(?Booking $booking): static
+    {
+        $this->booking = $booking;
 
         return $this;
     }
