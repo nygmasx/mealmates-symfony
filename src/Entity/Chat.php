@@ -25,7 +25,7 @@ class Chat
     #[Groups(['chat:list', 'chat:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['chat:list', 'chat:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
