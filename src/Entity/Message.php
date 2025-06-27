@@ -24,14 +24,6 @@ class Message
     #[Groups(['message:read'])]
     private ?string $content = null;
 
-    #[ORM\Column(nullable: true)]
-    #[Groups(['message:read'])]
-    private ?array $attachments = null;
-
-    #[ORM\Column(length: 50)]
-    #[Groups(['message:read'])]
-    private ?string $type = null;
-
     #[ORM\Column]
     #[Groups(['message:read'])]
     private ?\DateTimeImmutable $createdAt = null;
@@ -67,30 +59,6 @@ class Message
     public function setContent(string $content): static
     {
         $this->content = $content;
-
-        return $this;
-    }
-
-    public function getAttachments(): ?array
-    {
-        return $this->attachments;
-    }
-
-    public function setAttachments(?array $attachments): static
-    {
-        $this->attachments = $attachments;
-
-        return $this;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(string $type): static
-    {
-        $this->type = $type;
 
         return $this;
     }
