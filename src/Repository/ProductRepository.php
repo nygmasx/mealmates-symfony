@@ -19,15 +19,6 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
-    public function findAllOthers(User $user): array
-    {
-        return $this->createQueryBuilder('p')
-            ->where('p.user != :user')
-            ->setParameter('user', $user)
-            ->getQuery()
-            ->getResult();
-    }
-
     public function findProducsWithtLocations(): array
     {
         return $this->createQueryBuilder('p')
