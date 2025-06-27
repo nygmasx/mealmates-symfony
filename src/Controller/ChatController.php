@@ -83,8 +83,8 @@ class ChatController extends AbstractController
     #[OA\RequestBody(
         content: new OA\JsonContent(
             properties: [
-                new OA\Property(property: "productId", type: "integer"),
-                new OA\Property(property: "content", type: "string"),
+                new OA\Property(property: "productId", type: "string"),
+                new OA\Property(property: "message", type: "string"),
                 new OA\Property(property: "type", type: "string"),
                 new OA\Property(property: "attachments", type: "array", items: new OA\Items(type: "string"))
             ],
@@ -118,9 +118,11 @@ class ChatController extends AbstractController
         $chat->setCreatedAt(new \DateTimeImmutable());
 
         $message = new Message();
-        $message->setContent($data['content']);
+        $message->setContent($data['message']);
         $message->setType($data['type'] ?? 'text');
-        $message->setAttachments($data['attachments'] ?? null);
+        if ($data['attachments']) {
+            $message->setAttachments($data['attachments']);
+        }
         $message->setChat($chat);
         $message->setSender($user);
         $message->setCreatedAt(new \DateTimeImmutable());

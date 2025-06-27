@@ -27,7 +27,6 @@ final class ProductController extends AbstractController
     public function __construct(
         private readonly ProductRepository      $productRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly OrderRepository        $orderRepository,
     )
     {
     }
