@@ -26,7 +26,6 @@ class ChatController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly SerializerInterface    $serializer,
         private readonly ChatRepository         $chatRepository,
         private readonly ProductRepository      $productRepository,
         private readonly MessageRepository      $messageRepository
@@ -47,7 +46,7 @@ class ChatController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $chats = $this->chatRepository->findByUser($user);
+        $chats = $this->chatRepository->findAll();
 
         return $this->json($chats, Response::HTTP_OK, [], ['groups' => 'chat:list']);
     }
