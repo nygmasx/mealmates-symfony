@@ -117,6 +117,8 @@ class ChatController extends AbstractController
         $chat->setUserOneLastSeenAt(new \DateTimeImmutable());
         $chat->setCreatedAt(new \DateTimeImmutable());
 
+        $this->entityManager->persist($chat);
+
         $message = new Message();
         $message->setContent($data['message']);
         $message->setType($data['type'] ?? 'text');
@@ -129,8 +131,6 @@ class ChatController extends AbstractController
         $message->setIsDeleted(false);
 
         $this->entityManager->persist($message);
-
-        $chat->setUpdatedAt(new \DateTimeImmutable());
 
         $this->entityManager->flush();
 
