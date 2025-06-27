@@ -11,6 +11,7 @@ use App\Repository\MessageRepository;
 use App\Repository\ProductRepository;
 use App\Security\Voter\ChatVoter;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Attribute\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +34,13 @@ class ChatController extends AbstractController
     {
     }
 
+    #[OA\Response(
+        response: 200,
+        description: "Liste des chats de l'utilisateur"
+    )]
+    #[OA\Response(response: 401, description: "Utilisateur non authentifié")]
     #[OA\Tag(name: "Chat")]
+    #[Security(name: "Bearer")]
     #[Route('/list', name: 'chat_list', methods: ['GET'])]
     public function list(): JsonResponse
     {
@@ -45,7 +52,15 @@ class ChatController extends AbstractController
         return $this->json($chats, Response::HTTP_OK, [], ['groups' => 'chat:list']);
     }
 
+    #[OA\Response(
+        response: 200,
+        description: "Liste des messages du chat"
+    )]
+    #[OA\Response(response: 401, description: "Utilisateur non authentifié")]
+    #[OA\Response(response: 403, description: "Accès refusé au chat")]
+    #[OA\Response(response: 404, description: "Chat non trouvé")]
     #[OA\Tag(name: "Chat")]
+    #[Security(name: "Bearer")]
     #[Route('/{id}/messages', name: 'chat_messages', methods: ['GET'])]
     public function getMessages(Chat $chat, Request $request): JsonResponse
     {
@@ -64,7 +79,27 @@ class ChatController extends AbstractController
 
         return $this->json($messages, Response::HTTP_OK, [], ['groups' => 'message:read']);
     }
+
+    #[OA\RequestBody(
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: "productId", type: "integer"),
+                new OA\Property(property: "content", type: "string"),
+                new OA\Property(property: "type", type: "string"),
+                new OA\Property(property: "attachments", type: "array", items: new OA\Items(type: "string"))
+            ],
+            type: "object"
+        )
+    )]
+    #[OA\Response(
+        response: 201,
+        description: "Chat créé avec succès avec message initial"
+    )]
+    #[OA\Response(response: 400, description: "Données invalides")]
+    #[OA\Response(response: 401, description: "Utilisateur non authentifié")]
+    #[OA\Response(response: 404, description: "Produit non trouvé")]
     #[OA\Tag(name: "Chat")]
+    #[Security(name: "Bearer")]
     #[Route('/create', name: 'chat_create', methods: ['POST'])]
     public function createChat(Request $request): JsonResponse
     {
@@ -100,7 +135,26 @@ class ChatController extends AbstractController
         return $this->json($message, Response::HTTP_CREATED, [], ['groups' => 'message:read']);
     }
 
+    #[OA\RequestBody(
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(property: "content", type: "string"),
+                new OA\Property(property: "type", type: "string"),
+                new OA\Property(property: "attachments", type: "array", items: new OA\Items(type: "string"))
+            ],
+            type: "object"
+        )
+    )]
+    #[OA\Response(
+        response: 201,
+        description: "Message envoyé avec succès"
+    )]
+    #[OA\Response(response: 400, description: "Données invalides")]
+    #[OA\Response(response: 401, description: "Utilisateur non authentifié")]
+    #[OA\Response(response: 403, description: "Accès refusé au chat")]
+    #[OA\Response(response: 404, description: "Chat non trouvé")]
     #[OA\Tag(name: "Chat")]
+    #[Security(name: "Bearer")]
     #[Route('/{id}/messages', name: 'chat_send_message', methods: ['POST'])]
     public function sendMessage(Chat $chat, Request $request): JsonResponse
     {
@@ -129,7 +183,15 @@ class ChatController extends AbstractController
         return $this->json($message, Response::HTTP_CREATED, [], ['groups' => 'message:read']);
     }
 
+    #[OA\Response(
+        response: 200,
+        description: "Chat marqué comme lu"
+    )]
+    #[OA\Response(response: 401, description: "Utilisateur non authentifié")]
+    #[OA\Response(response: 403, description: "Accès refusé au chat")]
+    #[OA\Response(response: 404, description: "Chat non trouvé")]
     #[OA\Tag(name: "Chat")]
+    #[Security(name: "Bearer")]
     #[Route('/{id}/mark-read', name: 'chat_mark_read', methods: ['POST'])]
     public function markAsRead(Chat $chat): JsonResponse
     {
@@ -150,7 +212,13 @@ class ChatController extends AbstractController
         return $this->json(['status' => 'success']);
     }
 
+    #[OA\Response(
+        response: 200,
+        description: "Nombre de messages non lus par chat"
+    )]
+    #[OA\Response(response: 401, description: "Utilisateur non authentifié")]
     #[OA\Tag(name: "Chat")]
+    #[Security(name: "Bearer")]
     #[Route('/unread-counts', name: 'chat_unread_counts', methods: ['GET'])]
     public function getUnreadCounts(): JsonResponse
     {
