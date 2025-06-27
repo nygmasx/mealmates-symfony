@@ -7,6 +7,7 @@ use App\Entity\Message;
 use App\Entity\User;
 use App\Repository\ChatRepository;
 use App\Repository\MessageRepository;
+use App\Repository\ProductRepository;
 use App\Security\Voter\ChatVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -25,6 +26,7 @@ class ChatController extends AbstractController
         private readonly EntityManagerInterface $entityManager,
         private readonly SerializerInterface $serializer,
         private readonly ChatRepository $chatRepository,
+        private readonly ProductRepository $productRepository,
         private readonly MessageRepository $messageRepository
     ) {}
 
@@ -56,6 +58,41 @@ class ChatController extends AbstractController
         }
 
         return $this->json($messages, Response::HTTP_OK, [], ['groups' => 'message:read']);
+    }
+
+    #[Route('/create', name: 'chat_create', methods: ['POST'])]
+    public function createChat(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $product = $this->productRepository->findOneBy(['id' => $data['productId']]);
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $chat = new Chat();
+        $chat->setRelatedProduct($product);
+        $chat->setUserOne($user);
+        $chat->setUserTwo($product->getUser());
+        $chat->setUserOneLastSeenAt(new \DateTimeImmutable());
+        $chat->setCreatedAt(new \DateTimeImmutable());
+
+        $message = new Message();
+        $message->setContent($data['content']);
+        $message->setType($data['type'] ?? 'text');
+        $message->setAttachments($data['attachments'] ?? null);
+        $message->setChat($chat);
+        $message->setSender($user);
+        $message->setCreatedAt(new \DateTimeImmutable());
+        $message->setIsDeleted(false);
+
+        $this->entityManager->persist($message);
+
+        $chat->setUpdatedAt(new \DateTimeImmutable());
+
+        $this->entityManager->flush();
+
+        return $this->json($message, Response::HTTP_CREATED, [], ['groups' => 'message:read']);
     }
 
     #[Route('/{id}/messages', name: 'chat_send_message', methods: ['POST'])]
