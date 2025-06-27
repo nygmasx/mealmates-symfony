@@ -86,7 +86,7 @@ class ChatController extends AbstractController
                 new OA\Property(property: "productId", type: "string"),
                 new OA\Property(property: "message", type: "string"),
                 new OA\Property(property: "type", type: "string"),
-                new OA\Property(property: "attachments", type: "array", items: new OA\Items(type: "string"))
+                new OA\Property(property: "attachments", type: "array", items: new OA\Items(type: "string"), nullable: true)
             ],
             type: "object"
         )
