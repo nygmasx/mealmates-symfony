@@ -98,6 +98,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $chats;
 
     /**
+     * @var Collection<int, Chat>
+     */
+    #[ORM\OneToMany(targetEntity: Chat::class, mappedBy: 'userTwo')]
+    private Collection $chatsAsUserTwo;
+
+    /**
      * @var Collection<int, Booking>
      */
     #[ORM\OneToMany(targetEntity: Booking::class, mappedBy: 'user')]
@@ -110,6 +116,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->orders = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->chats = new ArrayCollection();
+        $this->chatsAsUserTwo = new ArrayCollection();
         $this->bookings = new ArrayCollection();
     }
 
@@ -401,6 +408,43 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Chat>
+     */
+    public function getChatsAsUserTwo(): Collection
+    {
+        return $this->chatsAsUserTwo;
+    }
+
+    public function addChatAsUserTwo(Chat $chat): static
+    {
+        if (!$this->chatsAsUserTwo->contains($chat)) {
+            $this->chatsAsUserTwo->add($chat);
+            $chat->setUserTwo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChatAsUserTwo(Chat $chat): static
+    {
+        if ($this->chatsAsUserTwo->removeElement($chat)) {
+            if ($chat->getUserTwo() === $this) {
+                $chat->setUserTwo(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAllChats(): Collection
+    {
+        return new ArrayCollection(array_merge(
+            $this->chats->toArray(),
+            $this->chatsAsUserTwo->toArray()
+        ));
     }
 
     /**

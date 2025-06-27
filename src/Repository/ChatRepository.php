@@ -21,7 +21,6 @@ class ChatRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('c')
             ->where('c.userOne = :user OR c.userTwo = :user')
-            ->setParameter('user', $user)
             ->orderBy('c.createdAt', 'DESC')
             ->getQuery()
             ->getResult();

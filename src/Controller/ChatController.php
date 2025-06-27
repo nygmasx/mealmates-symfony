@@ -46,7 +46,7 @@ class ChatController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $chats = $this->chatRepository->findAll();
+        $chats = $this->chatRepository->findByUser($user);
 
         return $this->json($chats, Response::HTTP_OK, [], ['groups' => 'chat:list']);
     }
