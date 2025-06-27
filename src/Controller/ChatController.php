@@ -122,7 +122,7 @@ class ChatController extends AbstractController
         $message = new Message();
         $message->setContent($data['message']);
         $message->setType($data['type'] ?? 'text');
-        if ($data['attachments']) {
+        if (isset($data['attachments'])) {
             $message->setAttachments($data['attachments']);
         }
         $message->setChat($chat);
