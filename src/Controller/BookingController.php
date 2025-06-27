@@ -96,7 +96,6 @@ final class BookingController extends AbstractController
 
             $chat = new Chat();
             $chat->setCreatedAt(new \DateTimeImmutable())
-                ->setUpdatedAt(new \DateTimeImmutable())
                 ->setRelatedProduct($product)
                 ->setUserOne($user)
                 ->setUserTwo($product->getUser())

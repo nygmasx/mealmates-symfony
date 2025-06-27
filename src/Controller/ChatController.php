@@ -178,8 +178,6 @@ class ChatController extends AbstractController
 
         $this->entityManager->persist($message);
 
-        $chat->setUpdatedAt(new \DateTimeImmutable());
-
         $this->entityManager->flush();
 
         return $this->json($message, Response::HTTP_CREATED, [], ['groups' => 'message:read']);
