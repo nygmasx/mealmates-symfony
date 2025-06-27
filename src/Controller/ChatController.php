@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Chat;
 use App\Entity\Message;
 use App\Entity\User;
+use OpenApi\Attributes as OA;
 use App\Repository\ChatRepository;
 use App\Repository\MessageRepository;
 use App\Repository\ProductRepository;
@@ -24,12 +25,15 @@ class ChatController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly SerializerInterface $serializer,
-        private readonly ChatRepository $chatRepository,
-        private readonly ProductRepository $productRepository,
-        private readonly MessageRepository $messageRepository
-    ) {}
+        private readonly SerializerInterface    $serializer,
+        private readonly ChatRepository         $chatRepository,
+        private readonly ProductRepository      $productRepository,
+        private readonly MessageRepository      $messageRepository
+    )
+    {
+    }
 
+    #[OA\Tag(name: "Chat")]
     #[Route('/list', name: 'chat_list', methods: ['GET'])]
     public function list(): JsonResponse
     {
@@ -41,6 +45,7 @@ class ChatController extends AbstractController
         return $this->json($chats, Response::HTTP_OK, [], ['groups' => 'chat:list']);
     }
 
+    #[OA\Tag(name: "Chat")]
     #[Route('/{id}/messages', name: 'chat_messages', methods: ['GET'])]
     public function getMessages(Chat $chat, Request $request): JsonResponse
     {
@@ -59,7 +64,7 @@ class ChatController extends AbstractController
 
         return $this->json($messages, Response::HTTP_OK, [], ['groups' => 'message:read']);
     }
-
+    #[OA\Tag(name: "Chat")]
     #[Route('/create', name: 'chat_create', methods: ['POST'])]
     public function createChat(Request $request): JsonResponse
     {
@@ -95,6 +100,7 @@ class ChatController extends AbstractController
         return $this->json($message, Response::HTTP_CREATED, [], ['groups' => 'message:read']);
     }
 
+    #[OA\Tag(name: "Chat")]
     #[Route('/{id}/messages', name: 'chat_send_message', methods: ['POST'])]
     public function sendMessage(Chat $chat, Request $request): JsonResponse
     {
@@ -123,6 +129,7 @@ class ChatController extends AbstractController
         return $this->json($message, Response::HTTP_CREATED, [], ['groups' => 'message:read']);
     }
 
+    #[OA\Tag(name: "Chat")]
     #[Route('/{id}/mark-read', name: 'chat_mark_read', methods: ['POST'])]
     public function markAsRead(Chat $chat): JsonResponse
     {
@@ -143,6 +150,7 @@ class ChatController extends AbstractController
         return $this->json(['status' => 'success']);
     }
 
+    #[OA\Tag(name: "Chat")]
     #[Route('/unread-counts', name: 'chat_unread_counts', methods: ['GET'])]
     public function getUnreadCounts(): JsonResponse
     {
