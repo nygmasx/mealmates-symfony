@@ -48,7 +48,7 @@ class ChatController extends AbstractController
 
         $chats = $this->chatRepository->findByUser($user);
 
-        return $this->json($chats, Response::HTTP_OK, [], ['groups' => 'chat:list']);
+        return $this->json($chats, Response::HTTP_OK, [], ['groups' => ['chat:summary', 'product:summary', 'user:summary', 'message:summary']]);
     }
 
     #[OA\Response(
@@ -84,7 +84,6 @@ class ChatController extends AbstractController
             properties: [
                 new OA\Property(property: "productId", type: "string"),
                 new OA\Property(property: "message", type: "string"),
-                new OA\Property(property: "type", type: "string"),
             ],
             type: "object"
         )
@@ -161,7 +160,6 @@ class ChatController extends AbstractController
 
         $message = new Message();
         $message->setContent($data['content']);
-        $message->setType($data['type'] ?? 'text');
         $message->setChat($chat);
         $message->setSender($user);
         $message->setCreatedAt(new \DateTimeImmutable());

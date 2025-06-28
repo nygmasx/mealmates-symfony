@@ -6,6 +6,7 @@ use App\Entity\Chat;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 /**
  * @extends ServiceEntityRepository<Chat>
@@ -20,8 +21,12 @@ class ChatRepository extends ServiceEntityRepository
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('c')
-            ->where('c.userOne = :user OR c.userTwo = :user')
-            ->setParameter('user', $user)
+            ->leftJoin('c.userOne', 'u1')
+            ->leftJoin('c.userTwo', 'u2')
+            ->leftJoin('c.relatedProduct', 'p')
+            ->addSelect('u1', 'u2', 'p') // Eager load the relations
+            ->where('IDENTITY(c.userOne) = :userId OR IDENTITY(c.userTwo) = :userId')
+            ->setParameter('userId', $user->getId(), UuidType::NAME)
             ->orderBy('c.createdAt', 'DESC')
             ->getQuery()
             ->getResult();

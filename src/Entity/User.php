@@ -23,13 +23,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    #[Groups(["user:read"])]
+    #[Groups(["user:read", "user:summary"])]
     private ?Uuid $id = null;
 
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank]
     #[Assert\Email]
-    #[Groups(["user:read", "user:write"])]
+    #[Groups(["user:read", "user:write", "user:summary"])]
     private ?string $email = null;
 
     /**

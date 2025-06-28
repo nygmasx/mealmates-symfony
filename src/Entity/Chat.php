@@ -18,27 +18,27 @@ class Chat
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    #[Groups(['chat:list', 'chat:read'])]
+    #[Groups(['chat:list', 'chat:read', 'chat:summary'])]
     private ?Uuid $id = null;
 
     #[ORM\Column]
-    #[Groups(['chat:list', 'chat:read'])]
+    #[Groups(['chat:list', 'chat:read', 'chat:summary'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['chat:list', 'chat:read'])]
+    #[Groups(['chat:list', 'chat:read', 'chat:summary'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'chats')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['chat:list', 'chat:read'])]
+    #[Groups(['chat:list', 'chat:read', 'chat:summary'])]
     private ?Product $relatedProduct = null;
 
     /**
      * @var Collection<int, Message>
      */
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'chat')]
-    #[Groups(['chat:read'])]
+    #[Groups(['chat:read', 'chat:summary'])]
     private Collection $messages;
 
     #[ORM\ManyToOne(inversedBy: 'chats')]
