@@ -76,7 +76,7 @@ class ChatController extends AbstractController
             );
         }
 
-        return $this->json($messages, Response::HTTP_OK, [], ['groups' => 'message:read']);
+        return $this->json($messages, Response::HTTP_OK, [], ['groups' => ['message:read', 'user:summary']]);
     }
 
     #[OA\RequestBody(
