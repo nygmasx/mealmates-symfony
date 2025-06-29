@@ -24,10 +24,11 @@ class ChatRepository extends ServiceEntityRepository
             ->leftJoin('c.userOne', 'u1')
             ->leftJoin('c.userTwo', 'u2')
             ->leftJoin('c.relatedProduct', 'p')
-            ->addSelect('u1', 'u2', 'p') // Eager load the relations
+            ->addSelect('u1', 'u2', 'p')
             ->where('IDENTITY(c.userOne) = :userId OR IDENTITY(c.userTwo) = :userId')
             ->setParameter('userId', $user->getId(), UuidType::NAME)
             ->orderBy('c.createdAt', 'DESC')
+            ->addOrderBy('c.updatedAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
