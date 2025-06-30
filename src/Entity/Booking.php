@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
@@ -17,27 +18,34 @@ class Booking
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     private ?User $user = null;
 
     #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?bool $isConfirmed = null;
 
     #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?bool $isOutdated = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?\DateTimeImmutable $confirmedAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?\DateTimeImmutable $outdatedAt = null;
 
     #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?float $totalPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
