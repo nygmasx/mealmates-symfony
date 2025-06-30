@@ -16,28 +16,20 @@ class BookingRepository extends ServiceEntityRepository
         parent::__construct($registry, Booking::class);
     }
 
-    //    /**
-    //     * @return Booking[] Returns an array of Booking objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('b.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return Booking[] Returns an array of Booking objects where user is either buyer or seller
+     */
+    public function findAllBookingsForUser($user): array
+    {
+        $buyerBookings = $this->findBy(['user' => $user]);
+        
+        $sellerBookings = $this->createQueryBuilder('b')
+            ->join('b.product', 'p')
+            ->where('p.user = :seller')
+            ->setParameter('seller', $user)
+            ->getQuery()
+            ->getResult();
 
-    //    public function findOneBySomeField($value): ?Booking
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return array_merge($buyerBookings, $sellerBookings);
+    }
 }

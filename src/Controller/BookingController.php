@@ -145,16 +145,7 @@ final class BookingController extends AbstractController
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $myBookings = $this->bookingRepository->findBy(['user' => $user]);
-
-        $sellerBookings = $this->bookingRepository->createQueryBuilder('b')
-            ->join('b.product', 'p')
-            ->where('p.user = :seller')
-            ->setParameter('seller', $user)
-            ->getQuery()
-            ->getResult();
-
-        $allBookings = array_merge($myBookings, $sellerBookings);
+        $allBookings = $this->bookingRepository->findAllBookingsForUser($user);
 
         $bookingsData = array_map(function ($booking) use ($user) {
             $isSellerView = $this->isUserSeller($booking, $user);
@@ -168,7 +159,8 @@ final class BookingController extends AbstractController
                 ],
                 'buyer' => [
                     'id' => $booking->getUser()->getId(),
-                    'name' => $booking->getUser()->getFirstName() ?? $booking->getUser()->getLastName()
+                    'name' => $booking->getUser()->getFirstName() . ' ' . $booking->getUser()->getLastName(),
+                    'email' => $booking->getUser()->getEmail(),
                 ],
                 'total_price' => $booking->getTotalPrice(),
                 'created_at' => $booking->getCreatedAt()->format('c'),
