@@ -13,7 +13,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:check-expiring-products',
-    description: 'Vérifie les produits qui approchent de leur expiration'
+    description: 'Envoie des alertes 48h avant expiration'
 )]
 class CheckExpiringProductsCommand extends Command
 {
@@ -29,64 +29,40 @@ class CheckExpiringProductsCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $startDate = new \DateTime();
-        $endDate = new \DateTime('+7 days'); // Vérifier 7 jours à l'avance
-
-        $expiringProducts = $this->productRepository->findExpiringProducts($startDate, $endDate);
+        $productsExpiring = $this->productRepository->findProductsExpiringInDays(2);
 
         $alertsSent = 0;
 
-        foreach ($expiringProducts as $product) {
-            $daysUntilExpiration = $this->calculateDaysUntilExpiration($product->getExpirationDate());
-
-            if ($this->shouldSendAlert($product, $daysUntilExpiration)) {
-                $this->alertService->sendExpirationAlert($product, $daysUntilExpiration);
-
-                $product->setLastAlertSent(new \DateTime())
-                    ->incrementAlertCount();
-
-                $this->entityManager->persist($product);
-                $alertsSent++;
-
-                $io->info("Alerte envoyée pour le produit: {$product->getTitle()}");
+        foreach ($productsExpiring as $product) {
+            if ($this->hasRecentAlert($product)) {
+                continue;
             }
+
+            $this->alertService->sendExpirationAlert($product, 2);
+
+            $product->setLastAlertSentAt(new \DateTimeImmutable());
+            $product->setAlertCount(($product->getAlertCount() ?? 0) + 1);
+            $this->entityManager->persist($product);
+
+            $alertsSent++;
+            $io->info("Alerte envoyée pour: {$product->getTitle()}");
         }
 
         $this->entityManager->flush();
 
-        $io->success("Vérification terminée. {$alertsSent} alertes envoyées sur {$expiringProducts->count()} produits vérifiés.");
-
+        $io->success("{$alertsSent} alertes envoyées.");
         return Command::SUCCESS;
     }
 
-    private function calculateDaysUntilExpiration(\DateTimeInterface $expirationDate): int
+    private function hasRecentAlert($product): bool
     {
-        $now = new \DateTime();
-        $interval = $now->diff($expirationDate);
+        $lastAlert = $product->getLastAlertSentAt();
 
-        return $interval->days;
-    }
-
-    private function shouldSendAlert($product, int $daysUntilExpiration): bool
-    {
-        if ($daysUntilExpiration <= $product->getAlertDaysBefore() && $product->getAlertCount() === 0) {
-            return true;
+        if (!$lastAlert) {
+            return false; // Jamais d'alerte envoyée
         }
 
-        if ($daysUntilExpiration === 1) {
-            $lastAlert = $product->getLastAlertSent();
-            if (!$lastAlert || $lastAlert->diff(new \DateTime())->h >= 24) {
-                return true;
-            }
-        }
-
-        if ($daysUntilExpiration === 0) {
-            $lastAlert = $product->getLastAlertSent();
-            if (!$lastAlert || $lastAlert->diff(new \DateTime())->h >= 6) {
-                return true;
-            }
-        }
-
-        return false;
+        $hoursSince = $lastAlert->diff(new \DateTimeImmutable())->h;
+        return $hoursSince < 24;
     }
 }

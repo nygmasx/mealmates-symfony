@@ -2,71 +2,110 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alerte d'expiration - {{ product.title }}</title>
 </head>
-<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; text-align: center;">
-    <h1 style="color: white; margin: 0;">
+<body style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8fafc;">
+
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+    <h1 style="color: white; margin: 0; font-size: 24px; font-weight: 600;">
         {% if daysUntilExpiration == 0 %}
             🚨 Action immédiate requise
         {% elseif daysUntilExpiration == 1 %}
             ⚠️ Alerte expiration
+        {% elseif daysUntilExpiration == 2 %}
+            📅 Rappel d'expiration (48h)
         {% else %}
             📅 Rappel d'expiration
         {% endif %}
     </h1>
 </div>
 
-<div style="padding: 30px;">
-    <p>Bonjour {{ user.firstName ?? user.name }},</p>
+<div style="background: white; padding: 35px 25px; border-radius: 0 0 8px 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
 
-    <div style="background: {% if urgencyLevel == 'critical' %}#fee2e2{% elseif urgencyLevel == 'urgent' %}#fef3c7{% else %}#f3f4f6{% endif %}; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h2 style="margin-top: 0; color: {% if urgencyLevel == 'critical' %}#dc2626{% elseif urgencyLevel == 'urgent' %}#d97706{% else %}#374151{% endif %};">
+    <p style="font-size: 16px; color: #1f2937; margin-bottom: 25px;">
+        Bonjour {{ user.firstName ?? user.name }},
+    </p>
+
+    <!-- Carte produit avec urgence -->
+    <div style="background: {% if urgencyLevel == 'critical' %}#fee2e2{% elseif urgencyLevel == 'urgent' %}#fef3c7{% elseif urgencyLevel == 'high' %}#fef3e2{% else %}#f3f4f6{% endif %}; padding: 25px; border-radius: 12px; margin: 25px 0; border-left: 4px solid {% if urgencyLevel == 'critical' %}#dc2626{% elseif urgencyLevel == 'urgent' %}#d97706{% elseif urgencyLevel == 'high' %}#f59e0b{% else %}#6b7280{% endif %};">
+
+        <h2 style="margin-top: 0; margin-bottom: 15px; color: {% if urgencyLevel == 'critical' %}#dc2626{% elseif urgencyLevel == 'urgent' %}#d97706{% elseif urgencyLevel == 'high' %}#f59e0b{% else %}#374151{% endif %}; font-size: 20px;">
             {{ product.title }}
         </h2>
 
         {% if daysUntilExpiration == 0 %}
-            <p><strong>⏰ Expire aujourd'hui !</strong></p>
-            <p>Votre produit expire aujourd'hui. Pour éviter le gaspillage, nous vous recommandons de le passer en don gratuit immédiatement.</p>
+            <p style="margin: 10px 0; font-weight: 600;"><strong>⏰ Expire aujourd'hui !</strong></p>
+            <p style="margin: 10px 0; line-height: 1.6;">Votre produit expire aujourd'hui. Pour éviter le gaspillage, nous vous recommandons de le passer en don gratuit immédiatement.</p>
         {% elseif daysUntilExpiration == 1 %}
-            <p><strong>⏰ Expire demain</strong></p>
-            <p>Votre produit expire dans moins de 24h. Vous pouvez encore le vendre à prix réduit ou le convertir en don gratuit.</p>
+            <p style="margin: 10px 0; font-weight: 600;"><strong>⏰ Expire demain</strong></p>
+            <p style="margin: 10px 0; line-height: 1.6;">Votre produit expire dans moins de 24h. Vous pouvez encore le vendre à prix réduit ou le convertir en don gratuit.</p>
+        {% elseif daysUntilExpiration == 2 %}
+            <p style="margin: 10px 0; font-weight: 600;"><strong>⏰ Expire dans 2 jours (48h)</strong></p>
+            <p style="margin: 10px 0; line-height: 1.6;">Il vous reste 48 heures pour optimiser la vente de ce produit. C'est le moment idéal pour ajuster votre stratégie.</p>
         {% else %}
-            <p><strong>⏰ Expire dans {{ daysUntilExpiration }} jours</strong></p>
-            <p>Il est temps de penser à ajuster votre stratégie pour ce produit.</p>
+            <p style="margin: 10px 0; font-weight: 600;"><strong>⏰ Expire dans {{ daysUntilExpiration }} jours</strong></p>
+            <p style="margin: 10px 0; line-height: 1.6;">Il est temps de penser à ajuster votre stratégie pour ce produit.</p>
         {% endif %}
 
-        {% if product.price > 0 %}
-            <p><strong>Prix actuel :</strong> {{ product.price }}€</p>
-        {% else %}
-            <p><strong>Statut :</strong> Don gratuit</p>
-        {% endif %}
+        <div style="background: rgba(255,255,255,0.7); padding: 15px; border-radius: 8px; margin: 15px 0;">
+            {% if product.price > 0 %}
+                <p style="margin: 5px 0;"><strong>💰 Prix actuel :</strong> {{ product.price }}€</p>
+            {% else %}
+                <p style="margin: 5px 0;"><strong>🎁 Statut :</strong> Don gratuit</p>
+            {% endif %}
+
+            {% if product.type %}
+                <p style="margin: 5px 0;"><strong>📂 Type :</strong> {{ product.type }}</p>
+            {% endif %}
+        </div>
     </div>
 
-    <div style="text-align: center; margin: 30px 0;">
-        <a href="{{ editUrl }}" style="background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+    <div style="text-align: center; margin: 35px 0;">
+        <a href="{{ editUrl }}" style="background: #10b981; color: white; padding: 18px 35px; text-decoration: none; border-radius: 10px; display: inline-block; font-weight: 600; font-size: 16px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.25); transition: all 0.2s;">
             ✏️ Modifier mon produit
         </a>
     </div>
 
-    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3>💡 Actions recommandées :</h3>
-        <ul>
+    <div style="background: #f9fafb; padding: 25px; border-radius: 12px; margin: 25px 0; border: 1px solid #e5e7eb;">
+        <h3 style="margin-top: 0; margin-bottom: 20px; color: #374151; font-size: 18px;">💡 Actions recommandées :</h3>
+        <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
             {% if product.price > 0 %}
-                <li><strong>Réduire le prix</strong> pour accélérer la vente</li>
-                <li><strong>Passer en don gratuit</strong> pour éviter le gaspillage</li>
+                <li style="margin-bottom: 8px;"><strong>💸 Réduire le prix</strong> pour accélérer la vente</li>
+                <li style="margin-bottom: 8px;"><strong>🎁 Passer en don gratuit</strong> pour éviter le gaspillage</li>
             {% endif %}
-            <li><strong>Mettre en avant</strong> dans votre vitrine</li>
-            <li><strong>Contacter directement</strong> vos clients réguliers</li>
+            <li style="margin-bottom: 8px;"><strong>⭐ Mettre en avant</strong> dans votre vitrine</li>
+            <li style="margin-bottom: 8px;"><strong>📞 Contacter directement</strong> vos clients réguliers</li>
+            <li style="margin-bottom: 8px;"><strong>📱 Partager sur les réseaux sociaux</strong> pour plus de visibilité</li>
         </ul>
     </div>
 
-    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+    {% if daysUntilExpiration == 2 %}
+        <div style="background: linear-gradient(135deg, #e0f2fe 0%, #f1f8e9 100%); padding: 20px; border-radius: 10px; margin: 25px 0; text-align: center;">
+            <p style="margin: 0; color: #2e7d32; font-weight: 600;">
+                💚 Saviez-vous que 78% des produits mis en don sont récupérés dans les 48h ?
+            </p>
+        </div>
+    {% endif %}
 
-    <p style="font-size: 14px; color: #6b7280;">
-        Vous recevez cette alerte car vous avez activé les notifications d'expiration.
-        <a href="{{ path('user_preferences') }}">Gérer mes préférences de notification</a>
-    </p>
+    <hr style="margin: 35px 0; border: none; border-top: 1px solid #e5e7eb;">
+
+    <div style="text-align: center;">
+        <p style="font-size: 14px; color: #6b7280; margin-bottom: 15px;">
+            Vous recevez cette alerte car vous avez activé les notifications d'expiration.
+        </p>
+        <p style="font-size: 14px; margin: 0;">
+            <a href="#" style="color: #3b82f6; text-decoration: none;">⚙️ Gérer mes préférences</a>
+            •
+            <a href="#" style="color: #6b7280; text-decoration: none;">📧 Nous contacter</a>
+        </p>
+    </div>
+
 </div>
+
+<div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
+    <p style="margin: 0;">© {{ "now"|date("Y") }} VotreSite - Ensemble contre le gaspillage alimentaire</p>
+</div>
+
 </body>
 </html>
