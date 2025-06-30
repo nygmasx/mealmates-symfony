@@ -294,13 +294,11 @@
 </head>
 <body>
 <div class="container">
-    <!-- Header -->
     <div class="header">
         <h1>🍽️ Meal Mates</h1>
         <p class="subtitle">Votre réservation a été créée avec succès</p>
     </div>
 
-    <!-- Content -->
     <div class="content">
         <div class="greeting">
             Bonjour {{ booking.user.firstName ?? booking.user.name }},
@@ -308,7 +306,6 @@
 
         <p>Merci pour votre réservation ! Voici le récapitulatif de votre commande :</p>
 
-        <!-- Booking Info -->
         <div class="booking-info">
             <div class="booking-number">
                 <strong>Numéro de réservation :</strong> #{{ booking.id }}
@@ -319,10 +316,8 @@
             <span class="status-badge">⏳ En attente de confirmation</span>
         </div>
 
-        <!-- Products Section -->
         <div class="products-section">
             <h2 class="section-title">📦 Produits réservés</h2>
-
 
             <div class="product-item">
                 <div class="product-info">
@@ -343,7 +338,6 @@
             </div>
         </div>
 
-        <!-- Total Section -->
         <div class="total-section">
             <div class="total-row">
                 <span class="total-label">Nombre d'articles :</span>
@@ -367,7 +361,6 @@
             </div>
         </div>
 
-        <!-- Seller Info -->
         {% set seller = booking.product.user %}
         <div class="seller-info">
             <h3>👨‍🍳 Votre vendeur</h3>
@@ -377,7 +370,6 @@
             {% endif %}
         </div>
 
-        <!-- Next Steps -->
         <div class="next-steps">
             <h3>🚀 Prochaines étapes</h3>
             <ul>
@@ -397,9 +389,8 @@
             </div>
         {% endif %}
 
-        <!-- CTA Button -->
         <div style="text-align: center;">
-            <a href="https://yoursite.com/bookings/{{ booking.id }}" class="cta-button">
+            <a href="https://mealmates.testingtest.fr/messages/{{ booking.id }}" class="cta-button">
                 📱 Suivre ma réservation
             </a>
         </div>
@@ -419,14 +410,11 @@
 
         <p><strong>Meal Mates</strong> - Ensemble contre le gaspillage alimentaire</p>
         <p>
-            <a href="https://yoursite.com">Accueil</a> |
-            <a href="https://yoursite.com/contact">Contact</a> |
-            <a href="https://yoursite.com/unsubscribe">Se désabonner</a>
+            <a href="https://mealmates.testingtest.fr">Accueil</a>
         </p>
         <p style="font-size: 12px; color: #999;">
             Cet email a été envoyé à {{ booking.user.email }}.<br>
             Si vous ne souhaitez plus recevoir ces emails,
-            <a href="https://yoursite.com/unsubscribe">cliquez ici</a>.
         </p>
     </div>
 </div>

@@ -371,14 +371,14 @@
         </div>
 
         <div class="action-buttons">
-            <a href="https://yoursite.com/bookings/{{ booking.id }}/confirm" class="btn btn-confirm">
+            <a href="https://mealmates.testingtest.fr/messages/{{ booking.chat.id }}/confirm" class="btn btn-confirm">
                 ✅ Confirmer la réservation
             </a>
-            <a href="https://yoursite.com/bookings/{{ booking.id }}/reject" class="btn btn-reject">
+            <a href="https://mealmates.testingtest.fr/bookings/{{ booking.id }}/reject" class="btn btn-reject">
                 ❌ Refuser la demande
             </a>
             <br>
-            <a href="https://yoursite.com/bookings/{{ booking.id }}" class="btn btn-view">
+            <a href="https://mealmates.testingtest.fr/bookings/{{ booking.id }}" class="btn btn-view">
                 👁️ Voir les détails
             </a>
         </div>
@@ -415,13 +415,11 @@
 
         <p><strong>Meal Mates</strong> - Ensemble contre le gaspillage alimentaire</p>
         <p>
-            <a href="https://yoursite.com">Accueil</a> |
-            <a href="https://yoursite.com/seller-dashboard">Tableau de bord vendeur</a> |
-            <a href="https://yoursite.com/contact">Contact</a>
+            <a href="https://mealmates.testingtest.fr">Accueil</a> |
+            <a href="https://mealmates.testingtest.fr/seller-dashboard">Tableau de bord vendeur</a> |
         </p>
         <p style="font-size: 12px; color: #999;">
-            Cet email a été envoyé à {{ booking.product.user.email }}.<br>
-            Pour gérer vos notifications, <a href="https://yoursite.com/settings">cliquez ici</a>.
+            Cet email a été envoyé à {{ booking.product.user.email }}.
         </p>
     </div>
 </div>

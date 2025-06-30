@@ -62,7 +62,7 @@ class AlertService
                 'daysUntilExpiration' => $daysUntilExpiration,
                 'urgencyLevel' => $this->getUrgencyLevel($daysUntilExpiration),
                 'actions' => $this->getAvailableActions($product),
-                'editUrl' => "https://yoursite.com/products/edit/{$product->getId()}"
+                'editUrl' => "https://mealmates.testingtest.fr/products/edit/{$product->getId()}"
             ]));
 
         $this->mailer->send($email);
