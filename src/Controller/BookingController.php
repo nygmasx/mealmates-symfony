@@ -289,6 +289,7 @@ final class BookingController extends AbstractController
                     'name' => $booking->getUser()->getFirstName() . ' ' . $booking->getUser()->getLastName(),
                     'email' => $booking->getUser()->getEmail(),
                 ],
+                'chat' => $booking->getChat()->getId(),
                 'total_price' => $booking->getTotalPrice(),
                 'created_at' => $booking->getCreatedAt()->format('c'),
                 'is_confirmed' => $booking->isConfirmed(),
