@@ -17,15 +17,15 @@ class Message
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    #[Groups(['message:read'])]
+    #[Groups(['message:read', 'message:summary'])]
     private ?Uuid $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['message:read'])]
+    #[Groups(['message:read', 'message:summary'])]
     private ?string $content = null;
 
     #[ORM\Column]
-    #[Groups(['message:read'])]
+    #[Groups(['message:read', 'message:summary'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -43,7 +43,7 @@ class Message
 
     #[ORM\ManyToOne(inversedBy: 'messages')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['message:read'])]
+    #[Groups(['message:read', 'message:summary'])]
     private ?User $sender = null;
 
     public function getId(): ?Uuid

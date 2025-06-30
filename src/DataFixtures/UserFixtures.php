@@ -28,6 +28,15 @@ class UserFixtures extends Fixture
                 'isVerified' => true,
             ],
             [
+                'reference' => self::REFERENCE_IDENTIFIER . 'TEST',
+                'email' => 'test@test.fr',
+                'firstName' => 'Test',
+                'lastName' => 'Test',
+                'password' => 'test123',
+                'roles' => ['ROLE_ADMIN'],
+                'isVerified' => true,
+            ],
+            [
                 'reference' => self::REFERENCE_IDENTIFIER . 'USER',
                 'email' => 'user@mealmates.fr',
                 'firstName' => 'User',

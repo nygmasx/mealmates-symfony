@@ -19,15 +19,15 @@ class Product
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
-    #[Groups(["product:read"])]
+    #[Groups(["product:read", "product:summary"])]
     private ?Uuid $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["product:read", "product:write"])]
+    #[Groups(["product:read", "product:write", "product:summary"])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    #[Groups(["product:read", "product:write"])]
+    #[Groups(["product:read", "product:write", "product:summary"])]
     private ?\DateTimeImmutable $expiresAt = null;
 
     /**
@@ -47,7 +47,7 @@ class Product
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["product:read"])]
+    #[Groups(["product:read", "product:summary"])]
     private ?User $user = null;
 
     /**
