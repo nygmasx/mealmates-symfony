@@ -32,4 +32,17 @@ class BookingRepository extends ServiceEntityRepository
 
         return array_merge($buyerBookings, $sellerBookings);
     }
+
+    /**
+     * @return Booking[] Returns an array of Booking objects where user is the seller (product owner)
+     */
+    public function findBookingsForSeller($user): array
+    {
+        return $this->createQueryBuilder('b')
+            ->join('b.product', 'p')
+            ->where('p.user = :seller')
+            ->setParameter('seller', $user)
+            ->getQuery()
+            ->getResult();
+    }
 }

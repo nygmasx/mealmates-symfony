@@ -262,6 +262,49 @@ final class BookingController extends AbstractController
 
     #[OA\Response(
         response: 200,
+        description: "Réservations où l'utilisateur est le vendeur"
+    )]
+    #[OA\Tag(name: "Bookings")]
+    #[Security(name: "Bearer")]
+    #[Route('/seller', name: 'app_bookings_seller', methods: ['GET'])]
+    public function sellerBookings(): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $sellerBookings = $this->bookingRepository->findBookingsForSeller($user);
+
+        $bookingsData = array_map(function ($booking) {
+            return [
+                'id' => $booking->getId(),
+                'product' => [
+                    'id' => $booking->getProduct()->getId(),
+                    'title' => $booking->getProduct()->getTitle(),
+                    'price' => $booking->getProduct()->getPrice()
+                ],
+                'buyer' => [
+                    'id' => $booking->getUser()->getId(),
+                    'name' => $booking->getUser()->getFirstName() . ' ' . $booking->getUser()->getLastName(),
+                    'email' => $booking->getUser()->getEmail(),
+                ],
+                'total_price' => $booking->getTotalPrice(),
+                'created_at' => $booking->getCreatedAt()->format('c'),
+                'is_confirmed' => $booking->isConfirmed(),
+                'is_outdated' => $booking->isOutdated(),
+                'confirmed_at' => $booking->getConfirmedAt()?->format('c'),
+                'outdated_at' => $booking->getOutdatedAt()?->format('c'),
+                'can_confirm' => !$booking->isConfirmed() && !$booking->isOutdated(),
+                'can_reject' => !$booking->isConfirmed() && !$booking->isOutdated()
+            ];
+        }, $sellerBookings);
+
+        return new JsonResponse($bookingsData);
+    }
+
+    #[OA\Response(
+        response: 200,
         description: "Réservations en attente pour le vendeur"
     )]
     #[OA\Tag(name: "Bookings")]
@@ -377,7 +420,6 @@ final class BookingController extends AbstractController
             return new JsonResponse(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
-        // Vérifier que l'utilisateur peut voir cette réservation
         if ($booking->getUser() !== $user && !$this->isUserSeller($booking, $user)) {
             return new JsonResponse([
                 'message' => 'Accès non autorisé à cette réservation'
