@@ -12,6 +12,7 @@ use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
+use Stripe\PaymentIntent;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -458,6 +459,68 @@ final class BookingController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/confirm-payment', name: 'app_bookings_confirm_payment', methods: ['POST'])]
+    public function confirmPayment(Booking $booking, Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (!$booking) {
+            return new JsonResponse(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
+        }
+
+        if (!$this->isUserBuyer($booking, $user)) {
+            return new JsonResponse([
+                'message' => 'Seul l\'acheteur peut confirmer le paiement'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $paymentIntentId = $data['payment_intent_id'] ?? '';
+
+        if (empty($paymentIntentId)) {
+            return new JsonResponse([
+                'message' => 'Payment Intent ID requis'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+
+            $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
+
+            if ($paymentIntent->status === 'succeeded') {
+                $booking->setIsPaid(true)
+                    ->setIsPaidAt(new \DateTimeImmutable())
+                    ->setPaymentIntentId($paymentIntentId);
+
+                $this->entityManager->flush();
+
+                $this->notificationService->sendPaymentConfirmationNotification($booking);
+
+                return new JsonResponse([
+                    'id' => $booking->getId(),
+                    'is_paid' => $booking->isPaid(),
+                    'paid_at' => $booking->getIsPaidAt()?->format('c'),
+                    'payment_intent_id' => $paymentIntentId,
+                    'message' => 'Paiement confirmé avec succès'
+                ]);
+
+            } else {
+                return new JsonResponse([
+                    'message' => 'Le paiement n\'a pas été validé par Stripe'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => 'Erreur lors de la confirmation du paiement: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     private function hasActiveBooking(Product $product, User $buyer): bool
     {
@@ -474,6 +537,11 @@ final class BookingController extends AbstractController
     private function isUserSeller(Booking $booking, User $user): bool
     {
         return $booking->getProduct()->getUser() === $user;
+    }
+
+    private function isUserBuyer(Booking $booking, User $user): bool
+    {
+        return $booking->getUser()?->getId() === $user->getId();
     }
 
     private function getHoursSinceCreation(Booking $booking): int

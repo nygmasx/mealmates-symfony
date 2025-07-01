@@ -55,6 +55,15 @@ class Booking
     #[ORM\OneToOne(mappedBy: 'booking', cascade: ['persist', 'remove'])]
     private ?Chat $chat = null;
 
+    #[ORM\Column]
+    private ?bool $isPaid = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $isPaidAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $paymentIntentId = null;
+
     public function __construct()
     {
     }
@@ -176,6 +185,42 @@ class Booking
         }
 
         $this->chat = $chat;
+
+        return $this;
+    }
+
+    public function isPaid(): ?bool
+    {
+        return $this->isPaid;
+    }
+
+    public function setIsPaid(bool $isPaid): static
+    {
+        $this->isPaid = $isPaid;
+
+        return $this;
+    }
+
+    public function getIsPaidAt(): ?\DateTimeImmutable
+    {
+        return $this->isPaidAt;
+    }
+
+    public function setIsPaidAt(?\DateTimeImmutable $isPaidAt): static
+    {
+        $this->isPaidAt = $isPaidAt;
+
+        return $this;
+    }
+
+    public function getPaymentIntentId(): ?string
+    {
+        return $this->paymentIntentId;
+    }
+
+    public function setPaymentIntentId(?string $paymentIntentId): static
+    {
+        $this->paymentIntentId = $paymentIntentId;
 
         return $this;
     }

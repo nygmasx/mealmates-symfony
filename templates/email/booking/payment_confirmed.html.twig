@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement confirmé - Meal Mates</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .success-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .payment-info {
+            background: #ecfdf5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+
+        .payment-number {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .payment-date {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .party-info {
+            background: #ecfdf5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #10b981;
+        }
+
+        .party-info h3 {
+            margin: 0 0 10px 0;
+            color: #065f46;
+            font-size: 18px;
+        }
+
+        .party-info p {
+            margin: 5px 0;
+            color: #047857;
+        }
+
+        .products-section {
+            margin: 30px 0;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .product-description {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        .total-section {
+            background: #ecfdf5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: right;
+            border-left: 4px solid #10b981;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .total-label {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .total-value {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .total-final {
+            border-top: 2px solid #10b981;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .total-final .total-label {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .total-final .total-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        .next-steps {
+            background: #ecfdf5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #10b981;
+        }
+
+        .next-steps h3 {
+            margin: 0 0 15px 0;
+            color: #065f46;
+            font-size: 18px;
+        }
+
+        .next-steps ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .next-steps li {
+            margin-bottom: 8px;
+            color: #047857;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .warning-box {
+            background: #fef7ff;
+            border: 1px solid #d8b4fe;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .warning-box p {
+            margin: 0;
+            color: #7c3aed;
+            font-size: 14px;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #10b981;
+            text-decoration: none;
+        }
+
+        .social-links {
+            margin: 20px 0;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #10b981;
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .header, .content, .footer {
+                padding: 20px 15px;
+            }
+
+            .product-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .total-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🍽️ Meal Mates</h1>
+        <p class="subtitle">
+            {% if recipientRole == 'buyer' %}
+                Paiement confirmé avec succès !
+            {% else %}
+                Nouveau paiement reçu !
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="content">
+        <div class="success-badge">
+            {% if recipientRole == 'buyer' %}
+                💳 Votre paiement a été traité avec succès !
+            {% else %}
+                💰 Vous avez reçu un paiement !
+            {% endif %}
+        </div>
+
+        <div class="greeting">
+            {% if recipientRole == 'buyer' %}
+                Bonjour {{ buyerName }},
+            {% else %}
+                Bonjour {{ sellerName }},
+            {% endif %}
+        </div>
+
+        <p>
+            {% if recipientRole == 'buyer' %}
+                Excellente nouvelle ! Votre paiement pour la réservation <strong>#{{ booking.id }}</strong> a été confirmé avec succès.
+                Vos produits vous attendent !
+            {% else %}
+                Félicitations ! Vous avez reçu un paiement de <strong>{{ buyerName }}</strong> pour la réservation <strong>#{{ booking.id }}</strong>.
+                Les fonds seront transférés sur votre compte dans les prochains jours.
+            {% endif %}
+        </p>
+
+        <div class="payment-info">
+            <div class="payment-number">
+                <strong>Numéro de réservation :</strong> #{{ booking.id }}
+            </div>
+            <div class="payment-date">
+                <strong>Paiement confirmé le :</strong> {{ booking.isPaidAt|date('d/m/Y à H:i') }}
+            </div>
+            {% if booking.paymentIntentId %}
+                <div class="payment-number">
+                    <strong>Référence de paiement :</strong> {{ booking.paymentIntentId }}
+                </div>
+            {% endif %}
+            <span class="status-badge">✅ Payé</span>
+        </div>
+
+        <div class="party-info">
+            {% if recipientRole == 'buyer' %}
+                <h3>👨‍🍳 Votre vendeur</h3>
+                <p><strong>{{ sellerName }}</strong></p>
+                {% set seller = booking.product.user %}
+                {% if seller.email %}
+                    <p>📧 {{ seller.email }}</p>
+                {% endif %}
+            {% else %}
+                <h3>👤 Votre acheteur</h3>
+                <p><strong>{{ buyerName }}</strong></p>
+                {% if booking.user.email %}
+                    <p>📧 {{ booking.user.email }}</p>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="products-section">
+            <h2 class="section-title">📦 Produits payés</h2>
+
+            <div class="product-item">
+                <div class="product-info">
+                    <h3>{{ booking.product.title }}</h3>
+                    <p class="product-description">Type: {{ booking.product.type }}</p>
+                    {% if booking.product.expiresAt %}
+                        <p class="product-description">
+                            <strong>🗓️ Expire le :</strong> {{ booking.product.expiresAt|date('d/m/Y') }}
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="product-price">
+                    {% if booking.product.price == 0 %}
+                        <span style="color: #10b981;">GRATUIT</span>
+                    {% else %}
+                        {{ booking.product.price|number_format(2, ',', ' ') }}€
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="total-section">
+            <div class="total-row">
+                <span class="total-label">Nombre d'articles :</span>
+                <span class="total-value">1</span>
+            </div>
+            {% if booking.totalPrice > 0 %}
+                <div class="total-row">
+                    <span class="total-label">Sous-total :</span>
+                    <span class="total-value">{{ booking.totalPrice|number_format(2, ',', ' ') }}€</span>
+                </div>
+            {% endif %}
+            <div class="total-row total-final">
+                <span class="total-label">
+                    {% if recipientRole == 'buyer' %}
+                        Total payé :
+                    {% else %}
+                        Montant reçu :
+                    {% endif %}
+                </span>
+                <span class="total-value">
+                    {% if booking.totalPrice == 0 %}
+                        GRATUIT 🎁
+                    {% else %}
+                        {{ booking.totalPrice|number_format(2, ',', ' ') }}€
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="next-steps">
+            <h3>🚀 Prochaines étapes</h3>
+            {% if recipientRole == 'buyer' %}
+                <ul>
+                    <li><strong>Contactez le vendeur :</strong> Organisez un rendez-vous pour récupérer vos produits</li>
+                    <li><strong>Choisissez un lieu :</strong> Privilégiez un endroit public et pratique</li>
+                    <li><strong>Confirmez l'heure :</strong> Assurez-vous que vous êtes disponibles tous les deux</li>
+                    <li><strong>Récupérez vos produits :</strong> Vérifiez la qualité des produits lors de la remise</li>
+                    <li><strong>Profitez :</strong> Dégustez vos produits frais !</li>
+                </ul>
+            {% else %}
+                <ul>
+                    <li><strong>Contactez l'acheteur :</strong> Organisez un rendez-vous pour la remise des produits</li>
+                    <li><strong>Préparez les produits :</strong> Assurez-vous qu'ils sont toujours en bon état</li>
+                    <li><strong>Choisissez un lieu :</strong> Privilégiez un endroit public et pratique</li>
+                    <li><strong>Remettez les produits :</strong> Respectez le rendez-vous convenu</li>
+                    <li><strong>Recevez vos fonds :</strong> Le montant sera transféré sur votre compte sous 2-7 jours ouvrés</li>
+                </ul>
+            {% endif %}
+        </div>
+
+        {% if recipientRole == 'seller' and booking.totalPrice > 0 %}
+            <div class="warning-box">
+                <p>
+                    💰 <strong>Transfert automatique :</strong> Le montant de {{ booking.totalPrice|number_format(2, ',', ' ') }}€
+                    sera automatiquement transféré sur votre compte bancaire enregistré dans les 2 à 7 jours ouvrés.
+                </p>
+            </div>
+        {% endif %}
+
+        <div style="text-align: center;">
+            <a href="https://mealmates.testingtest.fr/bookings/{{ booking.id }}" class="cta-button">
+                {% if recipientRole == 'buyer' %}
+                    💬 Contacter le vendeur
+                {% else %}
+                    💬 Contacter l'acheteur
+                {% endif %}
+            </a>
+        </div>
+
+        <p style="margin-top: 30px; color: #666; text-align: center;">
+            <strong>
+                {% if recipientRole == 'buyer' %}
+                    Merci pour votre achat sécurisé !
+                {% else %}
+                    Félicitations pour cette vente réussie !
+                {% endif %}
+            </strong><br>
+            N'hésitez pas à nous contacter si vous avez des questions.
+        </p>
+    </div>
+
+    <div class="footer">
+        <p><strong>Meal Mates</strong> - Ensemble contre le gaspillage alimentaire</p>
+        <p>
+            <a href="https://mealmates.testingtest.fr">Accueil</a> |
+            <a href="https://mealmates.testingtest.fr/profile/bookings">Mes réservations</a>
+        </p>
+        <p style="font-size: 12px; color: #999;">
+            {% if recipientRole == 'buyer' %}
+                Cet email a été envoyé à {{ booking.user.email }}.
+            {% else %}
+                Cet email a été envoyé à {{ booking.product.user.email }}.
+            {% endif %}
+        </p>
+    </div>
+</div>
+</body>
+</html>
