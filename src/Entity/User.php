@@ -74,6 +74,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $reviews;
 
     /**
+     * @var Collection<int, Review>
+     */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'reviewedUser')]
+    private Collection $receivedReviews;
+
+    /**
      * @var Collection<int, Product>
      */
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'user', orphanRemoval: true)]
@@ -112,6 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->reviews = new ArrayCollection();
+        $this->receivedReviews = new ArrayCollection();
         $this->products = new ArrayCollection();
         $this->orders = new ArrayCollection();
         $this->messages = new ArrayCollection();
@@ -284,6 +291,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($review->getAuthor() === $this) {
                 $review->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReceivedReviews(): Collection
+    {
+        return $this->receivedReviews;
+    }
+
+    public function addReceivedReview(Review $receivedReview): static
+    {
+        if (!$this->receivedReviews->contains($receivedReview)) {
+            $this->receivedReviews->add($receivedReview);
+            $receivedReview->setReviewedUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReceivedReview(Review $receivedReview): static
+    {
+        if ($this->receivedReviews->removeElement($receivedReview)) {
+            // set the owning side to null (unless already changed)
+            if ($receivedReview->getReviewedUser() === $this) {
+                $receivedReview->setReviewedUser(null);
             }
         }
 
