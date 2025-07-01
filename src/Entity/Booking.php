@@ -68,6 +68,7 @@ class Booking
     private ?string $paymentIntentId = null;
 
     #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?bool $isDelivered = false;
 
     /**
