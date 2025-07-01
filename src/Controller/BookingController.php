@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use Nelmio\ApiDocBundle\Attribute\Security;
 use Stripe\PaymentIntent;
+use Stripe\Stripe;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -351,26 +352,23 @@ final class BookingController extends AbstractController
     #[OA\Tag(name: "Bookings")]
     #[Security(name: "Bearer")]
     #[Route('/{id}/cancel', name: 'app_bookings_cancel', methods: ['PATCH'])]
-    public function cancel(int $id): JsonResponse
+    public function cancel(Booking $booking): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $booking = $this->bookingRepository->find($id);
         if (!$booking) {
             return new JsonResponse(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
-        // Vérifier que l'utilisateur peut annuler (acheteur ou vendeur)
         if ($booking->getUser() !== $user && !$this->isUserSeller($booking, $user)) {
             return new JsonResponse([
                 'message' => 'Vous ne pouvez pas annuler cette réservation'
             ], Response::HTTP_FORBIDDEN);
         }
 
-        // Vérifier que la réservation peut être annulée
         if ($booking->isOutdated()) {
             return new JsonResponse([
                 'message' => 'Cette réservation est déjà annulée ou expirée'
@@ -383,7 +381,6 @@ final class BookingController extends AbstractController
 
             $this->entityManager->flush();
 
-            // Notifier l'autre partie
             $this->notificationService->sendBookingCancellationNotification($booking);
 
             return new JsonResponse([
@@ -459,6 +456,61 @@ final class BookingController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/create-payment-intent', name: 'app_bookings_create_payment_intent', methods: ['POST'])]
+    public function createPaymentIntent(Booking $booking, Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        if (!$this->isUserBuyer($booking, $user)) {
+            return new JsonResponse([
+                'message' => 'Seul l\'acheteur peut payer cette réservation'
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        if (!$booking->isConfirmed()) {
+            return new JsonResponse([
+                'message' => 'La réservation doit être confirmée avant le paiement'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($booking->isPaid()) {
+            return new JsonResponse([
+                'message' => 'Cette réservation est déjà payée'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+
+            $paymentIntent = PaymentIntent::create([
+                'amount' => $booking->getTotalPrice() * 100,
+                'currency' => 'eur',
+                'payment_method_types' => ['card'],
+                'metadata' => [
+                    'booking_id' => $booking->getId(),
+                    'user_id' => $user->getId(),
+                    'product_title' => $booking->getProduct()->getTitle(),
+                ],
+            ]);
+
+            $booking->setPaymentIntentId($paymentIntent->id);
+            $this->entityManager->flush();
+
+            return new JsonResponse([
+                'client_secret' => $paymentIntent->client_secret,
+                'payment_intent_id' => $paymentIntent->id,
+            ]);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => 'Erreur lors de la création du paiement: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     #[Route('/{id}/confirm-payment', name: 'app_bookings_confirm_payment', methods: ['POST'])]
     public function confirmPayment(Booking $booking, Request $request): JsonResponse
     {
@@ -487,7 +539,7 @@ final class BookingController extends AbstractController
         }
 
         try {
-            \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+            Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
 
             $paymentIntent = PaymentIntent::retrieve($paymentIntentId);
 
