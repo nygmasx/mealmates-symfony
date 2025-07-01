@@ -55,13 +55,16 @@ class Booking
     #[ORM\OneToOne(mappedBy: 'booking', cascade: ['persist', 'remove'])]
     private ?Chat $chat = null;
 
-    #[ORM\Column]
-    private ?bool $isPaid = null;
+    #[ORM\Column()]
+    #[Groups(['booking:summary', 'booking:read'])]
+    private ?bool $isPaid = false;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?\DateTimeImmutable $isPaidAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?string $paymentIntentId = null;
 
     public function __construct()

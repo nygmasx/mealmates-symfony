@@ -29,8 +29,7 @@ final class BookingController extends AbstractController
         private readonly BookingRepository      $bookingRepository,
         private readonly ProductRepository      $productRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly NotificationService    $notificationService,
-        private readonly SerializerInterface    $serializer
+        private readonly NotificationService    $notificationService
     )
     {
     }
@@ -93,6 +92,7 @@ final class BookingController extends AbstractController
                 ->setCreatedAt(new \DateTimeImmutable())
                 ->setIsConfirmed(false)
                 ->setIsOutdated(false)
+                ->setIsPaid(false)
                 ->setTotalPrice($totalPrice)
                 ->setProduct($product);
 
