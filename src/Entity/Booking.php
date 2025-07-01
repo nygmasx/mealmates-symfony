@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
@@ -17,27 +18,34 @@ class Booking
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: UuidGenerator::class)]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     private ?User $user = null;
 
     #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?bool $isConfirmed = null;
 
     #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?bool $isOutdated = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?\DateTimeImmutable $confirmedAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?\DateTimeImmutable $outdatedAt = null;
 
     #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
     private ?float $totalPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
@@ -47,8 +55,37 @@ class Booking
     #[ORM\OneToOne(mappedBy: 'booking', cascade: ['persist', 'remove'])]
     private ?Chat $chat = null;
 
+    #[ORM\Column()]
+    #[Groups(['booking:summary', 'booking:read'])]
+    private ?bool $isPaid = false;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['booking:summary', 'booking:read'])]
+    private ?\DateTimeImmutable $isPaidAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['booking:summary', 'booking:read'])]
+    private ?string $paymentIntentId = null;
+
+    #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
+    private ?bool $isDelivered = false;
+
+    /**
+     * @var Collection<int, QrValidationToken>
+     */
+    #[ORM\OneToMany(targetEntity: QrValidationToken::class, mappedBy: 'booking', orphanRemoval: true)]
+    private Collection $qrValidationTokens;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $isDeliveredAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $validationMethod = null;
+
     public function __construct()
     {
+        $this->qrValidationTokens = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -168,6 +205,108 @@ class Booking
         }
 
         $this->chat = $chat;
+
+        return $this;
+    }
+
+    public function isPaid(): ?bool
+    {
+        return $this->isPaid;
+    }
+
+    public function setIsPaid(bool $isPaid): static
+    {
+        $this->isPaid = $isPaid;
+
+        return $this;
+    }
+
+    public function getIsPaidAt(): ?\DateTimeImmutable
+    {
+        return $this->isPaidAt;
+    }
+
+    public function setIsPaidAt(?\DateTimeImmutable $isPaidAt): static
+    {
+        $this->isPaidAt = $isPaidAt;
+
+        return $this;
+    }
+
+    public function getPaymentIntentId(): ?string
+    {
+        return $this->paymentIntentId;
+    }
+
+    public function setPaymentIntentId(?string $paymentIntentId): static
+    {
+        $this->paymentIntentId = $paymentIntentId;
+
+        return $this;
+    }
+
+    public function isDelivered(): ?bool
+    {
+        return $this->isDelivered;
+    }
+
+    public function setIsDelivered(bool $isDelivered): static
+    {
+        $this->isDelivered = $isDelivered;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QrValidationToken>
+     */
+    public function getQrValidationTokens(): Collection
+    {
+        return $this->qrValidationTokens;
+    }
+
+    public function addQrValidationToken(QrValidationToken $qrValidationToken): static
+    {
+        if (!$this->qrValidationTokens->contains($qrValidationToken)) {
+            $this->qrValidationTokens->add($qrValidationToken);
+            $qrValidationToken->setBooking($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQrValidationToken(QrValidationToken $qrValidationToken): static
+    {
+        if ($this->qrValidationTokens->removeElement($qrValidationToken)) {
+            // set the owning side to null (unless already changed)
+            if ($qrValidationToken->getBooking() === $this) {
+                $qrValidationToken->setBooking(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getIsDeliveredAt(): ?\DateTimeImmutable
+    {
+        return $this->isDeliveredAt;
+    }
+
+    public function setIsDeliveredAt(?\DateTimeImmutable $isDeliveredAt): static
+    {
+        $this->isDeliveredAt = $isDeliveredAt;
+
+        return $this;
+    }
+
+    public function getValidationMethod(): ?string
+    {
+        return $this->validationMethod;
+    }
+
+    public function setValidationMethod(?string $validationMethod): static
+    {
+        $this->validationMethod = $validationMethod;
 
         return $this;
     }

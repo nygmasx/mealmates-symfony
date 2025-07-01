@@ -61,7 +61,7 @@ class Chat
 
     #[ORM\OneToOne(inversedBy: 'chat')]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['chat:read'])]
+    #[Groups(['chat:read', 'chat:summary'])]
     private ?Booking $booking = null;
 
     public function __construct()

@@ -183,4 +183,88 @@ class NotificationService
 
         $this->mailer->send($email);
     }
+
+    public function sendPaymentConfirmationNotification(Booking $booking): void
+    {
+        $seller = $booking->getProduct()->getUser();
+        $buyer = $booking->getUser();
+        $buyerName = $buyer->getFirstName() . ' ' . $buyer->getLastName();
+        $sellerName = $seller->getFirstName() . ' ' . $seller->getLastName();
+
+        $buyerEmail = new TemplatedEmail()
+            ->from(new Address('sallakimrane@gmail.com', 'Meal Mates'))
+            ->to($buyer->getEmail())
+            ->subject("💳 {$buyerName}, votre paiement a été confirmé !")
+            ->htmlTemplate('email/booking/payment_confirmed.html.twig')
+            ->context([
+                'booking' => $booking,
+                'buyerName' => $buyerName,
+                'sellerName' => $sellerName,
+                'recipientRole' => 'buyer'
+            ]);
+
+        $buyerEmail->getHeaders()
+            ->addTextHeader('X-Mailin-Tag', 'payment-confirmed-buyer');
+
+        $this->mailer->send($buyerEmail);
+
+        $sellerEmail = new TemplatedEmail()
+            ->from(new Address('sallakimrane@gmail.com', 'Meal Mates'))
+            ->to($seller->getEmail())
+            ->subject("💰 {$sellerName}, vous avez reçu un paiement !")
+            ->htmlTemplate('email/booking/payment_confirmed.html.twig')
+            ->context([
+                'booking' => $booking,
+                'buyerName' => $buyerName,
+                'sellerName' => $sellerName,
+                'recipientRole' => 'seller'
+            ]);
+
+        $sellerEmail->getHeaders()
+            ->addTextHeader('X-Mailin-Tag', 'payment-confirmed-seller');
+
+        $this->mailer->send($sellerEmail);
+    }
+
+    public function sendTransactionCompletedNotification(Booking $booking): void
+    {
+        $seller = $booking->getProduct()->getUser();
+        $buyer = $booking->getUser();
+        $buyerName = $buyer->getFirstName() . ' ' . $buyer->getLastName();
+        $sellerName = $seller->getFirstName() . ' ' . $seller->getLastName();
+
+        $buyerEmail = new TemplatedEmail()
+            ->from(new Address('sallakimrane@gmail.com', 'Meal Mates'))
+            ->to($buyer->getEmail())
+            ->subject("✅ {$buyerName}, votre transaction est terminée !")
+            ->htmlTemplate('email/booking/transaction_completed.html.twig')
+            ->context([
+                'booking' => $booking,
+                'buyerName' => $buyerName,
+                'sellerName' => $sellerName,
+                'recipientRole' => 'buyer'
+            ]);
+
+        $buyerEmail->getHeaders()
+            ->addTextHeader('X-Mailin-Tag', 'transaction-completed-buyer');
+
+        $this->mailer->send($buyerEmail);
+
+        $sellerEmail = new TemplatedEmail()
+            ->from(new Address('sallakimrane@gmail.com', 'Meal Mates'))
+            ->to($seller->getEmail())
+            ->subject("🎉 {$sellerName}, transaction finalisée avec succès !")
+            ->htmlTemplate('email/booking/transaction_completed.html.twig')
+            ->context([
+                'booking' => $booking,
+                'buyerName' => $buyerName,
+                'sellerName' => $sellerName,
+                'recipientRole' => 'seller'
+            ]);
+
+        $sellerEmail->getHeaders()
+            ->addTextHeader('X-Mailin-Tag', 'transaction-completed-seller');
+
+        $this->mailer->send($sellerEmail);
+    }
 }
