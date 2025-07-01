@@ -48,7 +48,7 @@ class ChatController extends AbstractController
 
         $chats = $this->chatRepository->findByUser($user);
 
-        return $this->json($chats, Response::HTTP_OK, [], ['groups' => ['chat:summary', 'product:summary', 'user:summary', 'message:summary']]);
+        return $this->json($chats, Response::HTTP_OK, [], ['groups' => ['chat:summary', 'product:summary', 'user:summary', 'message:summary', 'booking:summary']]);
     }
 
     #[OA\Response(

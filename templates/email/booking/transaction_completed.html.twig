@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction terminée - Meal Mates</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+        }
+
+        .header .subtitle {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .success-badge {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        .greeting {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .transaction-info {
+            background: #f0fdf4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #22c55e;
+        }
+
+        .transaction-number {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .transaction-date {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #22c55e;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .party-info {
+            background: #f0fdf4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #22c55e;
+        }
+
+        .party-info h3 {
+            margin: 0 0 10px 0;
+            color: #14532d;
+            font-size: 18px;
+        }
+
+        .party-info p {
+            margin: 5px 0;
+            color: #166534;
+        }
+
+        .products-section {
+            margin: 30px 0;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .product-description {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 600;
+            color: #22c55e;
+        }
+
+        .summary-section {
+            background: #f0fdf4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: right;
+            border-left: 4px solid #22c55e;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-label {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .summary-value {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .summary-final {
+            border-top: 2px solid #22c55e;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-final .summary-label {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .summary-final .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #22c55e;
+        }
+
+        .celebration {
+            background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .celebration h3 {
+            margin: 0 0 15px 0;
+            color: #92400e;
+            font-size: 18px;
+        }
+
+        .celebration p {
+            margin: 0 0 10px 0;
+            color: #b45309;
+        }
+
+        .next-steps {
+            background: #f0fdf4;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #22c55e;
+        }
+
+        .next-steps h3 {
+            margin: 0 0 15px 0;
+            color: #14532d;
+            font-size: 18px;
+        }
+
+        .next-steps ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .next-steps li {
+            margin-bottom: 8px;
+            color: #166534;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 20px 0;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .rating-section {
+            background: #e0f2fe;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            border-left: 4px solid #0ea5e9;
+            text-align: center;
+        }
+
+        .rating-section h3 {
+            margin: 0 0 15px 0;
+            color: #0c4a6e;
+            font-size: 18px;
+        }
+
+        .rating-section p {
+            margin: 0 0 15px 0;
+            color: #0369a1;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 20px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #22c55e;
+            text-decoration: none;
+        }
+
+        .social-links {
+            margin: 20px 0;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #22c55e;
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .header, .content, .footer {
+                padding: 20px 15px;
+            }
+
+            .product-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .summary-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🍽️ Meal Mates</h1>
+        <p class="subtitle">
+            {% if recipientRole == 'buyer' %}
+                Transaction terminée avec succès !
+            {% else %}
+                Votre vente est finalisée !
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="content">
+        <div class="success-badge">
+            {% if recipientRole == 'buyer' %}
+                🎉 Félicitations ! Votre achat est terminé
+            {% else %}
+                🎉 Bravo ! Votre vente est finalisée
+            {% endif %}
+        </div>
+
+        <div class="greeting">
+            {% if recipientRole == 'buyer' %}
+                Bonjour {{ buyerName }},
+            {% else %}
+                Bonjour {{ sellerName }},
+            {% endif %}
+        </div>
+
+        <p>
+            {% if recipientRole == 'buyer' %}
+                Parfait ! Votre transaction pour la réservation <strong>#{{ booking.id }}</strong> a été finalisée avec succès.
+                Nous espérons que vous avez apprécié vos produits frais !
+            {% else %}
+                Excellent ! La transaction pour la réservation <strong>#{{ booking.id }}</strong> a été validée par l'acheteur.
+                Votre vente est maintenant complètement terminée !
+            {% endif %}
+        </p>
+
+        <div class="transaction-info">
+            <div class="transaction-number">
+                <strong>Numéro de réservation :</strong> #{{ booking.id }}
+            </div>
+            <div class="transaction-date">
+                <strong>Transaction finalisée le :</strong> {{ booking.isDeliveredAt|date('d/m/Y à H:i') }}
+            </div>
+            {% if booking.validationMethod %}
+                <div class="transaction-number">
+                    <strong>Méthode de validation :</strong> 
+                    {% if booking.validationMethod == 'qr_code' %}
+                        QR Code
+                    {% else %}
+                        {{ booking.validationMethod }}
+                    {% endif %}
+                </div>
+            {% endif %}
+            <span class="status-badge">✅ Terminée</span>
+        </div>
+
+        <div class="party-info">
+            {% if recipientRole == 'buyer' %}
+                <h3>👨‍🍳 Votre vendeur</h3>
+                <p><strong>{{ sellerName }}</strong></p>
+                {% set seller = booking.product.user %}
+                {% if seller.email %}
+                    <p>📧 {{ seller.email }}</p>
+                {% endif %}
+            {% else %}
+                <h3>👤 Votre acheteur</h3>
+                <p><strong>{{ buyerName }}</strong></p>
+                {% if booking.user.email %}
+                    <p>📧 {{ booking.user.email }}</p>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="products-section">
+            <h2 class="section-title">📦 Produits 
+            {% if recipientRole == 'buyer' %}
+                achetés
+            {% else %}
+                vendus
+            {% endif %}
+            </h2>
+
+            <div class="product-item">
+                <div class="product-info">
+                    <h3>{{ booking.product.title }}</h3>
+                    <p class="product-description">Type: {{ booking.product.type }}</p>
+                    {% if booking.product.expiresAt %}
+                        <p class="product-description">
+                            <strong>🗓️ Date limite :</strong> {{ booking.product.expiresAt|date('d/m/Y') }}
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="product-price">
+                    {% if booking.product.price == 0 %}
+                        <span style="color: #22c55e;">GRATUIT</span>
+                    {% else %}
+                        {{ booking.product.price|number_format(2, ',', ' ') }}€
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-row">
+                <span class="summary-label">Nombre d'articles :</span>
+                <span class="summary-value">1</span>
+            </div>
+            {% if booking.totalPrice > 0 %}
+                <div class="summary-row">
+                    <span class="summary-label">
+                        {% if recipientRole == 'buyer' %}
+                            Montant payé :
+                        {% else %}
+                            Montant reçu :
+                        {% endif %}
+                    </span>
+                    <span class="summary-value">{{ booking.totalPrice|number_format(2, ',', ' ') }}€</span>
+                </div>
+            {% endif %}
+            <div class="summary-row summary-final">
+                <span class="summary-label">
+                    {% if recipientRole == 'buyer' %}
+                        Total de votre achat :
+                    {% else %}
+                        Total de votre vente :
+                    {% endif %}
+                </span>
+                <span class="summary-value">
+                    {% if booking.totalPrice == 0 %}
+                        GRATUIT 🎁
+                    {% else %}
+                        {{ booking.totalPrice|number_format(2, ',', ' ') }}€
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="celebration">
+            <h3>
+                {% if recipientRole == 'buyer' %}
+                    🌟 Merci pour votre achat !
+                {% else %}
+                    🏆 Félicitations pour votre vente !
+                {% endif %}
+            </h3>
+            <p>
+                {% if recipientRole == 'buyer' %}
+                    Vous avez contribué à la lutte contre le gaspillage alimentaire tout en découvrant de délicieux produits locaux.
+                {% else %}
+                    Vous avez évité le gaspillage tout en faisant plaisir à un autre membre de la communauté Meal Mates !
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="rating-section">
+            <h3>⭐ Votre avis compte</h3>
+            <p>
+                {% if recipientRole == 'buyer' %}
+                    Comment s'est déroulé votre achat ? Partagez votre expérience pour aider les autres membres.
+                {% else %}
+                    Comment s'est passée cette vente ? Votre retour nous aide à améliorer l'expérience pour tous.
+                {% endif %}
+            </p>
+            <a href="https://mealmates.testingtest.fr/bookings/{{ booking.id }}/review" class="cta-button">
+                ⭐ Laisser un avis
+            </a>
+        </div>
+
+        <div class="next-steps">
+            <h3>🚀 Et maintenant ?</h3>
+            {% if recipientRole == 'buyer' %}
+                <ul>
+                    <li><strong>Découvrez :</strong> Explorez d'autres produits frais sur notre plateforme</li>
+                    <li><strong>Partagez :</strong> Recommandez Meal Mates à vos amis et famille</li>
+                    <li><strong>Revenez :</strong> De nouveaux produits sont ajoutés chaque jour</li>
+                    <li><strong>Évaluez :</strong> Laissez un avis sur votre expérience d'achat</li>
+                </ul>
+            {% else %}
+                <ul>
+                    <li><strong>Vendez encore :</strong> Proposez d'autres produits quand vous en avez</li>
+                    <li><strong>Recevez vos fonds :</strong> Le paiement sera transféré automatiquement</li>
+                    <li><strong>Partagez :</strong> Invitez d'autres vendeurs à rejoindre la communauté</li>
+                    <li><strong>Continuez :</strong> Aidez à réduire le gaspillage alimentaire</li>
+                </ul>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center;">
+            <a href="https://mealmates.testingtest.fr/products" class="cta-button">
+                {% if recipientRole == 'buyer' %}
+                    🛒 Découvrir d'autres produits
+                {% else %}
+                    📱 Vendre d'autres produits
+                {% endif %}
+            </a>
+        </div>
+
+        <p style="margin-top: 30px; color: #666; text-align: center;">
+            <strong>
+                {% if recipientRole == 'buyer' %}
+                    Merci d'avoir choisi Meal Mates !
+                {% else %}
+                    Merci d'être un membre actif de Meal Mates !
+                {% endif %}
+            </strong><br>
+            Ensemble, nous construisons un avenir plus durable.
+        </p>
+    </div>
+
+    <div class="footer">
+        <p><strong>Meal Mates</strong> - Ensemble contre le gaspillage alimentaire</p>
+        <p>
+            <a href="https://mealmates.testingtest.fr">Accueil</a> |
+            <a href="https://mealmates.testingtest.fr/products">Produits</a> |
+            <a href="https://mealmates.testingtest.fr/profile/bookings">Mes réservations</a>
+        </p>
+        <p style="font-size: 12px; color: #999;">
+            {% if recipientRole == 'buyer' %}
+                Cet email a été envoyé à {{ booking.user.email }}.
+            {% else %}
+                Cet email a été envoyé à {{ booking.product.user.email }}.
+            {% endif %}
+        </p>
+    </div>
+</div>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Réservation confirmée - Meal Mates</title>
+    <title>Paiement confirmé - Meal Mates</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,7 +21,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             padding: 30px 20px;
             text-align: center;
@@ -40,7 +40,7 @@
         }
 
         .success-badge {
-            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             padding: 20px;
             border-radius: 12px;
@@ -60,21 +60,21 @@
             margin-bottom: 20px;
         }
 
-        .booking-info {
-            background: #e8f5e8;
+        .payment-info {
+            background: #ecfdf5;
             border-radius: 8px;
             padding: 20px;
             margin: 20px 0;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid #10b981;
         }
 
-        .booking-number {
+        .payment-number {
             font-size: 14px;
             color: #666;
             margin-bottom: 10px;
         }
 
-        .booking-date {
+        .payment-date {
             font-size: 14px;
             color: #666;
             margin-bottom: 15px;
@@ -82,7 +82,7 @@
 
         .status-badge {
             display: inline-block;
-            background: #4CAF50;
+            background: #10b981;
             color: white;
             padding: 8px 16px;
             border-radius: 20px;
@@ -92,23 +92,23 @@
             letter-spacing: 0.5px;
         }
 
-        .seller-info {
-            background: #e8f5e8;
+        .party-info {
+            background: #ecfdf5;
             border-radius: 8px;
             padding: 20px;
             margin: 30px 0;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid #10b981;
         }
 
-        .seller-info h3 {
+        .party-info h3 {
             margin: 0 0 10px 0;
-            color: #2E7D32;
+            color: #065f46;
             font-size: 18px;
         }
 
-        .seller-info p {
+        .party-info p {
             margin: 5px 0;
-            color: #388E3C;
+            color: #047857;
         }
 
         .products-section {
@@ -150,16 +150,16 @@
         .product-price {
             font-size: 18px;
             font-weight: 600;
-            color: #4CAF50;
+            color: #10b981;
         }
 
         .total-section {
-            background: #e8f5e8;
+            background: #ecfdf5;
             border-radius: 8px;
             padding: 20px;
             margin: 30px 0;
             text-align: right;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid #10b981;
         }
 
         .total-row {
@@ -179,7 +179,7 @@
         }
 
         .total-final {
-            border-top: 2px solid #4CAF50;
+            border-top: 2px solid #10b981;
             padding-top: 15px;
             margin-top: 15px;
         }
@@ -193,20 +193,20 @@
         .total-final .total-value {
             font-size: 24px;
             font-weight: 700;
-            color: #4CAF50;
+            color: #10b981;
         }
 
         .next-steps {
-            background: #e8f5e8;
+            background: #ecfdf5;
             border-radius: 8px;
             padding: 20px;
             margin: 30px 0;
-            border-left: 4px solid #4CAF50;
+            border-left: 4px solid #10b981;
         }
 
         .next-steps h3 {
             margin: 0 0 15px 0;
-            color: #2E7D32;
+            color: #065f46;
             font-size: 18px;
         }
 
@@ -217,12 +217,12 @@
 
         .next-steps li {
             margin-bottom: 8px;
-            color: #388E3C;
+            color: #047857;
         }
 
         .cta-button {
             display: inline-block;
-            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
             padding: 15px 30px;
             text-decoration: none;
@@ -238,8 +238,8 @@
         }
 
         .warning-box {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
+            background: #fef7ff;
+            border: 1px solid #d8b4fe;
             border-radius: 8px;
             padding: 15px;
             margin: 20px 0;
@@ -247,7 +247,7 @@
 
         .warning-box p {
             margin: 0;
-            color: #856404;
+            color: #7c3aed;
             font-size: 14px;
         }
 
@@ -265,7 +265,7 @@
         }
 
         .footer a {
-            color: #4CAF50;
+            color: #10b981;
             text-decoration: none;
         }
 
@@ -276,7 +276,7 @@
         .social-links a {
             display: inline-block;
             margin: 0 10px;
-            color: #4CAF50;
+            color: #10b981;
             font-size: 18px;
             text-decoration: none;
         }
@@ -308,42 +308,76 @@
 <div class="container">
     <div class="header">
         <h1>🍽️ Meal Mates</h1>
-        <p class="subtitle">Excellente nouvelle !</p>
+        <p class="subtitle">
+            {% if recipientRole == 'buyer' %}
+                Paiement confirmé avec succès !
+            {% else %}
+                Nouveau paiement reçu !
+            {% endif %}
+        </p>
     </div>
 
     <div class="content">
         <div class="success-badge">
-            ✅ Votre réservation a été confirmée !
+            {% if recipientRole == 'buyer' %}
+                💳 Votre paiement a été traité avec succès !
+            {% else %}
+                💰 Vous avez reçu un paiement !
+            {% endif %}
         </div>
 
         <div class="greeting">
-            Bonjour {{ buyerName }},
+            {% if recipientRole == 'buyer' %}
+                Bonjour {{ buyerName }},
+            {% else %}
+                Bonjour {{ sellerName }},
+            {% endif %}
         </div>
 
-        <p>Fantastique ! <strong>{{ sellerName }}</strong> a confirmé votre réservation.
-            Vous pouvez maintenant organiser la rencontre pour récupérer vos produits.</p>
+        <p>
+            {% if recipientRole == 'buyer' %}
+                Excellente nouvelle ! Votre paiement pour la réservation <strong>#{{ booking.id }}</strong> a été confirmé avec succès.
+                Vos produits vous attendent !
+            {% else %}
+                Félicitations ! Vous avez reçu un paiement de <strong>{{ buyerName }}</strong> pour la réservation <strong>#{{ booking.id }}</strong>.
+                Les fonds seront transférés sur votre compte dans les prochains jours.
+            {% endif %}
+        </p>
 
-        <div class="booking-info">
-            <div class="booking-number">
+        <div class="payment-info">
+            <div class="payment-number">
                 <strong>Numéro de réservation :</strong> #{{ booking.id }}
             </div>
-            <div class="booking-date">
-                <strong>Confirmée le :</strong> {{ booking.confirmedAt|date('d/m/Y à H:i') }}
+            <div class="payment-date">
+                <strong>Paiement confirmé le :</strong> {{ booking.isPaidAt|date('d/m/Y à H:i') }}
             </div>
-            <span class="status-badge">✅ Confirmée</span>
+            {% if booking.paymentIntentId %}
+                <div class="payment-number">
+                    <strong>Référence de paiement :</strong> {{ booking.paymentIntentId }}
+                </div>
+            {% endif %}
+            <span class="status-badge">✅ Payé</span>
         </div>
 
-        <div class="seller-info">
-            <h3>👨‍🍳 Votre vendeur</h3>
-            <p><strong>{{ sellerName }}</strong></p>
-            {% set seller = booking.product.user %}
-            {% if seller.email %}
-                <p>📧 {{ seller.email }}</p>
+        <div class="party-info">
+            {% if recipientRole == 'buyer' %}
+                <h3>👨‍🍳 Votre vendeur</h3>
+                <p><strong>{{ sellerName }}</strong></p>
+                {% set seller = booking.product.user %}
+                {% if seller.email %}
+                    <p>📧 {{ seller.email }}</p>
+                {% endif %}
+            {% else %}
+                <h3>👤 Votre acheteur</h3>
+                <p><strong>{{ buyerName }}</strong></p>
+                {% if booking.user.email %}
+                    <p>📧 {{ booking.user.email }}</p>
+                {% endif %}
             {% endif %}
         </div>
 
         <div class="products-section">
-            <h2 class="section-title">📦 Produits confirmés</h2>
+            <h2 class="section-title">📦 Produits payés</h2>
 
             <div class="product-item">
                 <div class="product-info">
@@ -357,7 +391,7 @@
                 </div>
                 <div class="product-price">
                     {% if booking.product.price == 0 %}
-                        <span style="color: #4CAF50;">GRATUIT</span>
+                        <span style="color: #10b981;">GRATUIT</span>
                     {% else %}
                         {{ booking.product.price|number_format(2, ',', ' ') }}€
                     {% endif %}
@@ -377,7 +411,13 @@
                 </div>
             {% endif %}
             <div class="total-row total-final">
-                <span class="total-label">Total à payer :</span>
+                <span class="total-label">
+                    {% if recipientRole == 'buyer' %}
+                        Total payé :
+                    {% else %}
+                        Montant reçu :
+                    {% endif %}
+                </span>
                 <span class="total-value">
                     {% if booking.totalPrice == 0 %}
                         GRATUIT 🎁
@@ -390,32 +430,52 @@
 
         <div class="next-steps">
             <h3>🚀 Prochaines étapes</h3>
-            <ul>
-                <li><strong>Contactez le vendeur :</strong> Organisez un rendez-vous pour la remise</li>
-                <li><strong>Choisissez un lieu :</strong> Privilégiez un endroit public et pratique</li>
-                <li><strong>Confirmez l'heure :</strong> Assurez-vous que vous êtes disponibles tous les deux</li>
-                <li><strong>Préparez le paiement :</strong> Le règlement se fait en main propre</li>
-                <li><strong>Vérifiez les produits :</strong> Contrôlez la qualité avant de payer</li>
-            </ul>
+            {% if recipientRole == 'buyer' %}
+                <ul>
+                    <li><strong>Contactez le vendeur :</strong> Organisez un rendez-vous pour récupérer vos produits</li>
+                    <li><strong>Choisissez un lieu :</strong> Privilégiez un endroit public et pratique</li>
+                    <li><strong>Confirmez l'heure :</strong> Assurez-vous que vous êtes disponibles tous les deux</li>
+                    <li><strong>Récupérez vos produits :</strong> Vérifiez la qualité des produits lors de la remise</li>
+                    <li><strong>Profitez :</strong> Dégustez vos produits frais !</li>
+                </ul>
+            {% else %}
+                <ul>
+                    <li><strong>Contactez l'acheteur :</strong> Organisez un rendez-vous pour la remise des produits</li>
+                    <li><strong>Préparez les produits :</strong> Assurez-vous qu'ils sont toujours en bon état</li>
+                    <li><strong>Choisissez un lieu :</strong> Privilégiez un endroit public et pratique</li>
+                    <li><strong>Remettez les produits :</strong> Respectez le rendez-vous convenu</li>
+                    <li><strong>Recevez vos fonds :</strong> Le montant sera transféré sur votre compte sous 2-7 jours ouvrés</li>
+                </ul>
+            {% endif %}
         </div>
 
-        {% if booking.totalPrice > 0 %}
+        {% if recipientRole == 'seller' and booking.totalPrice > 0 %}
             <div class="warning-box">
                 <p>
-                    💰 <strong>Rappel :</strong> Le paiement de {{ booking.totalPrice|number_format(2, ',', ' ') }}€
-                    s'effectue directement auprès du vendeur lors de la remise des produits.
+                    💰 <strong>Transfert automatique :</strong> Le montant de {{ booking.totalPrice|number_format(2, ',', ' ') }}€
+                    sera automatiquement transféré sur votre compte bancaire enregistré dans les 2 à 7 jours ouvrés.
                 </p>
             </div>
         {% endif %}
 
         <div style="text-align: center;">
             <a href="https://mealmates.testingtest.fr/bookings/{{ booking.id }}" class="cta-button">
-                💬 Contacter le vendeur
+                {% if recipientRole == 'buyer' %}
+                    💬 Contacter le vendeur
+                {% else %}
+                    💬 Contacter l'acheteur
+                {% endif %}
             </a>
         </div>
 
         <p style="margin-top: 30px; color: #666; text-align: center;">
-            <strong>Félicitations pour votre réservation confirmée !</strong><br>
+            <strong>
+                {% if recipientRole == 'buyer' %}
+                    Merci pour votre achat sécurisé !
+                {% else %}
+                    Félicitations pour cette vente réussie !
+                {% endif %}
+            </strong><br>
             N'hésitez pas à nous contacter si vous avez des questions.
         </p>
     </div>
@@ -424,9 +484,14 @@
         <p><strong>Meal Mates</strong> - Ensemble contre le gaspillage alimentaire</p>
         <p>
             <a href="https://mealmates.testingtest.fr">Accueil</a> |
+            <a href="https://mealmates.testingtest.fr/profile/bookings">Mes réservations</a>
         </p>
         <p style="font-size: 12px; color: #999;">
-            Cet email a été envoyé à {{ booking.user.email }}.
+            {% if recipientRole == 'buyer' %}
+                Cet email a été envoyé à {{ booking.user.email }}.
+            {% else %}
+                Cet email a été envoyé à {{ booking.product.user.email }}.
+            {% endif %}
         </p>
     </div>
 </div>
