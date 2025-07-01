@@ -127,6 +127,7 @@ final class BookingController extends AbstractController
                 'total_price' => $booking->getTotalPrice(),
                 'created_at' => $booking->getCreatedAt()->format('c'),
                 'is_confirmed' => $booking->isConfirmed(),
+                'is_delivered' => $booking->isDelivered(),
                 'is_outdated' => $booking->isOutdated(),
                 'message' => 'Réservation créée avec succès. En attente de confirmation du vendeur.'
             ], Response::HTTP_CREATED);
@@ -172,6 +173,7 @@ final class BookingController extends AbstractController
                 'total_price' => $booking->getTotalPrice(),
                 'created_at' => $booking->getCreatedAt()->format('c'),
                 'is_confirmed' => $booking->isConfirmed(),
+                'is_delivered' => $booking->isDelivered(),
                 'is_outdated' => $booking->isOutdated(),
                 'confirmed_at' => $booking->getConfirmedAt()?->format('c'),
                 'outdated_at' => $booking->getOutdatedAt()?->format('c'),
@@ -245,6 +247,7 @@ final class BookingController extends AbstractController
             return new JsonResponse([
                 'id' => $booking->getId(),
                 'is_confirmed' => $booking->isConfirmed(),
+                'is_delivered' => $booking->isDelivered(),
                 'is_outdated' => $booking->isOutdated(),
                 'confirmed_at' => $booking->getConfirmedAt()?->format('c'),
                 'outdated_at' => $booking->getOutdatedAt()?->format('c'),
@@ -291,6 +294,7 @@ final class BookingController extends AbstractController
                 'total_price' => $booking->getTotalPrice(),
                 'created_at' => $booking->getCreatedAt()->format('c'),
                 'is_confirmed' => $booking->isConfirmed(),
+                'is_delivered' => $booking->isDelivered(),
                 'is_outdated' => $booking->isOutdated(),
                 'confirmed_at' => $booking->getConfirmedAt()?->format('c'),
                 'outdated_at' => $booking->getOutdatedAt()?->format('c'),
@@ -433,6 +437,7 @@ final class BookingController extends AbstractController
             'total_price' => $booking->getTotalPrice(),
             'created_at' => $booking->getCreatedAt()->format('c'),
             'is_confirmed' => $booking->isConfirmed(),
+            'is_delivered' => $booking->isDelivered(),
             'is_outdated' => $booking->isOutdated(),
             'confirmed_at' => $booking->getConfirmedAt()?->format('c'),
             'outdated_at' => $booking->getOutdatedAt()?->format('c'),
@@ -699,6 +704,7 @@ final class BookingController extends AbstractController
         return new JsonResponse([
             'booking_id' => $booking->getId(),
             'is_confirmed' => $booking->isConfirmed(),
+            'is_delivered' => $booking->isDelivered(),
             'is_paid' => $booking->isPaid(),
             'is_completed' => $booking->isDelivered(),
             'completed_at' => $booking->getIsDeliveredAt()?->format('c'),
