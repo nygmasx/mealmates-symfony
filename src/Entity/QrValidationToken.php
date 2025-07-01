@@ -36,6 +36,11 @@ class QrValidationToken
     #[ORM\JoinColumn(nullable: false)]
     private ?Booking $booking = null;
 
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?Uuid
     {
         return $this->id;
