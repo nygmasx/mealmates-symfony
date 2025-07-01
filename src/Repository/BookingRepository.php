@@ -47,4 +47,31 @@ class BookingRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findBookingsNeedingReviewReminder(): array
+    {
+        $sevenDaysAgo = new \DateTimeImmutable('-7 days');
+
+        return $this->createQueryBuilder('b')
+            ->where('b.isDelivered = true')
+            ->andWhere(
+                $this->getEntityManager()->createQueryBuilder()
+                    ->expr()->orX(
+                        'b.buyerReviewLeft = false',
+                        'b.sellerReviewLeft = false'
+                    )
+            )
+            ->andWhere(
+                $this->getEntityManager()->createQueryBuilder()
+                    ->expr()->orX(
+                        'b.reviewReminderSentAt IS NULL',
+                        'b.reviewReminderSentAt <= :sevenDaysAgo'
+                    )
+            )
+            ->andWhere('b.isDeliveredAt >= :sevenDaysAgo')
+            ->setParameter('sevenDaysAgo', $sevenDaysAgo)
+            ->orderBy('b.isDeliveredAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
