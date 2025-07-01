@@ -428,6 +428,208 @@ final class BookingController extends AbstractController
         ]);
     }
 
+    #[OA\Response(
+        response: 200,
+        description: "Liste des articles achetés par l'utilisateur"
+    )]
+    #[OA\Tag(name: "Bookings")]
+    #[Security(name: "Bearer")]
+    #[Route('/purchased', name: 'app_bookings_purchased', methods: ['GET'])]
+    public function purchasedProducts(): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $purchasedBookings = $this->bookingRepository->createQueryBuilder('b')
+            ->join('b.product', 'p')
+            ->join('p.user', 'seller')
+            ->leftJoin('p.dietaryPreferences', 'dp')
+            ->leftJoin('b.chat', 'c')
+            ->where('b.user = :user')
+            ->andWhere('b.isConfirmed = true')
+            ->andWhere('b.isOutdated = false')
+            ->orderBy('b.confirmedAt', 'DESC')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
+
+        $purchasedProducts = array_map(function ($booking) {
+            $product = $booking->getProduct();
+            $seller = $product->getUser();
+            $chat = $booking->getChat();
+
+            $dietaryPreferences = [];
+            foreach ($product->getDietaryPreferences() as $preference) {
+                $dietaryPreferences[] = [
+                    'id' => $preference->getId(),
+                    'name' => $preference->getName() ?? null,
+                ];
+            }
+
+            return [
+                'booking_id' => $booking->getId(),
+                'product' => [
+                    'id' => $product->getId(),
+                    'title' => $product->getTitle(),
+                    'type' => $product->getType(),
+                    'price' => $product->getPrice(),
+                    'quantity' => $product->getQuantity(),
+                    'is_recurring' => $product->isRecurring(),
+                    'recurring_frequency' => $product->getRecurringFrequency(),
+                    'picking_address' => $product->getPickingAddress(),
+                    'expires_at' => $product->getExpiresAt()->format('c'),
+                    'updated_at' => $product->getUpdatedAt()?->format('c'),
+                    'days_until_expiration' => $product->getDaysUntilExpiration(),
+                    'has_available_pickup_today' => $product->hasAvailablePickupToday(),
+                    'images' => $product->getImages(),
+                    'first_image' => $product->getFirstImage(),
+                    'availabilities' => $product->getAvailabilities(),
+                    'dietary_preferences' => $dietaryPreferences,
+                    'alert_enabled' => $product->isAlertEnabled(),
+                    'alert_days_before' => $product->getAlertDaysBefore(),
+                    'last_alert_sent_at' => $product->getLastAlertSentAt()?->format('c'),
+                    'alert_count' => $product->getAlertCount()
+                ],
+                'seller' => [
+                    'id' => $seller->getId(),
+                    'first_name' => $seller->getFirstName(),
+                    'last_name' => $seller->getLastName(),
+                    'email' => $seller->getEmail(),
+                    'full_name' => trim($seller->getFirstName() . ' ' . $seller->getLastName()),
+                    'is_verified' => $seller->isVerified()
+                ],
+                'purchase_details' => [
+                    'total_price_paid' => $booking->getTotalPrice(),
+                    'purchased_at' => $booking->getConfirmedAt()->format('c'),
+                    'booking_created_at' => $booking->getCreatedAt()->format('c'),
+                    'hours_since_purchase' => $this->getHoursSinceDate($booking->getConfirmedAt())
+                ],
+                'chat' => $chat ? [
+                    'id' => $chat->getId(),
+                    'created_at' => $chat->getCreatedAt()->format('c')
+                ] : null
+            ];
+        }, $purchasedBookings);
+
+        return new JsonResponse([
+            'count' => count($purchasedProducts),
+            'purchases' => $purchasedProducts
+        ]);
+    }
+
+    #[OA\Response(response: 200, description: "Détails d'un article acheté")]
+    #[OA\Response(response: 404, description: "Article acheté non trouvé")]
+    #[OA\Response(response: 403, description: "Accès non autorisé")]
+    #[OA\Tag(name: "Bookings")]
+    #[Security(name: "Bearer")]
+    #[Route('/purchased/{bookingId}', name: 'app_bookings_purchased_show', methods: ['GET'])]
+    public function showPurchasedProduct(string $bookingId): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $booking = $this->bookingRepository->createQueryBuilder('b')
+            ->join('b.product', 'p')
+            ->join('p.user', 'seller')
+            ->leftJoin('p.dietaryPreferences', 'dp')
+            ->leftJoin('b.chat', 'c')
+            ->where('b.id = :bookingId')
+            ->andWhere('b.user = :user')
+            ->andWhere('b.isConfirmed = true')
+            ->andWhere('b.isOutdated = false')
+            ->setParameter('bookingId', $bookingId)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$booking) {
+            return new JsonResponse([
+                'message' => 'Article acheté non trouvé ou accès non autorisé'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        $product = $booking->getProduct();
+        $seller = $product->getUser();
+        $chat = $booking->getChat();
+
+        $dietaryPreferences = [];
+        foreach ($product->getDietaryPreferences() as $preference) {
+            $dietaryPreferences[] = [
+                'id' => $preference->getId(),
+                'name' => $preference->getName() ?? null,
+            ];
+        }
+
+        return new JsonResponse([
+            'booking_id' => $booking->getId(),
+            'product' => [
+                'id' => $product->getId(),
+                'title' => $product->getTitle(),
+                'type' => $product->getType(),
+                'price' => $product->getPrice(),
+                'quantity' => $product->getQuantity(),
+                'is_recurring' => $product->isRecurring(),
+                'recurring_frequency' => $product->getRecurringFrequency(),
+                'picking_address' => $product->getPickingAddress(),
+                'expires_at' => $product->getExpiresAt()->format('c'),
+                'updated_at' => $product->getUpdatedAt()?->format('c'),
+                'days_until_expiration' => $product->getDaysUntilExpiration(),
+                'has_available_pickup_today' => $product->hasAvailablePickupToday(),
+                'images' => $product->getImages(),
+                'first_image' => $product->getFirstImage(),
+                'availabilities' => $product->getAvailabilities(),
+                'dietary_preferences' => $dietaryPreferences,
+                'alert_enabled' => $product->isAlertEnabled(),
+                'alert_days_before' => $product->getAlertDaysBefore(),
+                'last_alert_sent_at' => $product->getLastAlertSentAt()?->format('c'),
+                'alert_count' => $product->getAlertCount()
+            ],
+            'seller' => [
+                'id' => $seller->getId(),
+                'first_name' => $seller->getFirstName(),
+                'last_name' => $seller->getLastName(),
+                'email' => $seller->getEmail(),
+                'full_name' => trim($seller->getFirstName() . ' ' . $seller->getLastName()),
+                'is_verified' => $seller->isVerified()
+            ],
+            'purchase_details' => [
+                'total_price_paid' => $booking->getTotalPrice(),
+                'purchased_at' => $booking->getConfirmedAt()->format('c'),
+                'booking_created_at' => $booking->getCreatedAt()->format('c'),
+                'hours_since_purchase' => $this->getHoursSinceDate($booking->getConfirmedAt()),
+                'days_since_purchase' => $this->getDaysSinceDate($booking->getConfirmedAt())
+            ],
+            'chat' => $chat ? [
+                'id' => $chat->getId(),
+                'created_at' => $chat->getCreatedAt()->format('c')
+            ] : null,
+            'booking_status' => [
+                'is_confirmed' => $booking->isConfirmed(),
+                'is_outdated' => $booking->isOutdated(),
+                'confirmed_at' => $booking->getConfirmedAt()?->format('c'),
+                'outdated_at' => $booking->getOutdatedAt()?->format('c')
+            ]
+        ]);
+    }
+
+    private function getHoursSinceDate(\DateTimeImmutable $date): int
+    {
+        $now = new \DateTimeImmutable();
+        $interval = $now->diff($date);
+        return $interval->h + ($interval->days * 24);
+    }
+
+    private function getDaysSinceDate(\DateTimeImmutable $date): int
+    {
+        $now = new \DateTimeImmutable();
+        $interval = $now->diff($date);
+        return $interval->days;
+    }
+
 
     private function hasActiveBooking(Product $product, User $buyer): bool
     {
