@@ -298,7 +298,7 @@
 
         <div class="buyer-info">
             <h3>👤 Informations de l'acheteur</h3>
-            <p><strong>{{ booking.user.firstName ?? booking.user.name }} {{ booking.user.lastName ?? '' }}</strong></p>
+            <p><strong>{{ booking.user.firstName }} {{ booking.user.lastName }}</strong></p>
             {% if booking.user.email %}
                 <p>📧 {{ booking.user.email }}</p>
             {% endif %}
@@ -346,7 +346,7 @@
         <div class="total-section">
             <div class="total-row">
                 <span class="total-label">Nombre d'articles :</span>
-                <span class="total-value">{{ booking.product|length }}</span>
+                <span class="total-value">1</span>
             </div>
             {% if booking.totalPrice > 0 %}
                 <div class="total-row">
