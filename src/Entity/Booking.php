@@ -67,8 +67,24 @@ class Booking
     #[Groups(['booking:summary', 'booking:read'])]
     private ?string $paymentIntentId = null;
 
+    #[ORM\Column]
+    private ?bool $isDelivered = false;
+
+    /**
+     * @var Collection<int, QrValidationToken>
+     */
+    #[ORM\OneToMany(targetEntity: QrValidationToken::class, mappedBy: 'booking', orphanRemoval: true)]
+    private Collection $qrValidationTokens;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $isDeliveredAt = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $validationMethod = null;
+
     public function __construct()
     {
+        $this->qrValidationTokens = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -224,6 +240,72 @@ class Booking
     public function setPaymentIntentId(?string $paymentIntentId): static
     {
         $this->paymentIntentId = $paymentIntentId;
+
+        return $this;
+    }
+
+    public function isDelivered(): ?bool
+    {
+        return $this->isDelivered;
+    }
+
+    public function setIsDelivered(bool $isDelivered): static
+    {
+        $this->isDelivered = $isDelivered;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QrValidationToken>
+     */
+    public function getQrValidationTokens(): Collection
+    {
+        return $this->qrValidationTokens;
+    }
+
+    public function addQrValidationToken(QrValidationToken $qrValidationToken): static
+    {
+        if (!$this->qrValidationTokens->contains($qrValidationToken)) {
+            $this->qrValidationTokens->add($qrValidationToken);
+            $qrValidationToken->setBooking($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQrValidationToken(QrValidationToken $qrValidationToken): static
+    {
+        if ($this->qrValidationTokens->removeElement($qrValidationToken)) {
+            // set the owning side to null (unless already changed)
+            if ($qrValidationToken->getBooking() === $this) {
+                $qrValidationToken->setBooking(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getIsDeliveredAt(): ?\DateTimeImmutable
+    {
+        return $this->isDeliveredAt;
+    }
+
+    public function setIsDeliveredAt(?\DateTimeImmutable $isDeliveredAt): static
+    {
+        $this->isDeliveredAt = $isDeliveredAt;
+
+        return $this;
+    }
+
+    public function getValidationMethod(): ?string
+    {
+        return $this->validationMethod;
+    }
+
+    public function setValidationMethod(?string $validationMethod): static
+    {
+        $this->validationMethod = $validationMethod;
 
         return $this;
     }

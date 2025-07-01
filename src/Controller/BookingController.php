@@ -5,9 +5,12 @@ namespace App\Controller;
 use App\Entity\Booking;
 use App\Entity\Chat;
 use App\Entity\Product;
+use App\Entity\QrValidationToken;
 use App\Entity\User;
 use App\Repository\BookingRepository;
 use App\Repository\ProductRepository;
+use App\Repository\QrValidationTokenRepository;
+use App\Security\Voter\BookingVoter;
 use App\Service\NotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Attribute\Model;
@@ -21,6 +24,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Uid\Uuid;
 
 #[Route('/bookings')]
 final class BookingController extends AbstractController
@@ -29,7 +33,8 @@ final class BookingController extends AbstractController
         private readonly BookingRepository      $bookingRepository,
         private readonly ProductRepository      $productRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly NotificationService    $notificationService
+        private readonly NotificationService    $notificationService,
+        private readonly QrValidationTokenRepository $qrValidationTokenRepository,
     )
     {
     }
@@ -150,7 +155,7 @@ final class BookingController extends AbstractController
         $allBookings = $this->bookingRepository->findAllBookingsForUser($user);
 
         $bookingsData = array_map(function ($booking) use ($user) {
-            $isSellerView = $this->isUserSeller($booking, $user);
+            $isSellerView = $booking->getProduct()->getUser() === $user;
 
             return [
                 'id' => $booking->getId(),
@@ -201,11 +206,7 @@ final class BookingController extends AbstractController
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
 
-        if (!$this->isUserSeller($booking, $user)) {
-            return new JsonResponse([
-                'message' => 'Seul le vendeur peut répondre à cette réservation'
-            ], Response::HTTP_FORBIDDEN);
-        }
+        $this->denyAccessUnlessGranted(BookingVoter::RESPOND, $booking);
 
         if ($booking->isConfirmed() || $booking->isOutdated()) {
             return new JsonResponse([
@@ -363,11 +364,7 @@ final class BookingController extends AbstractController
             return new JsonResponse(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
-        if ($booking->getUser() !== $user && !$this->isUserSeller($booking, $user)) {
-            return new JsonResponse([
-                'message' => 'Vous ne pouvez pas annuler cette réservation'
-            ], Response::HTTP_FORBIDDEN);
-        }
+        $this->denyAccessUnlessGranted(BookingVoter::CANCEL, $booking);
 
         if ($booking->isOutdated()) {
             return new JsonResponse([
@@ -402,25 +399,16 @@ final class BookingController extends AbstractController
     #[OA\Tag(name: "Bookings")]
     #[Security(name: "Bearer")]
     #[Route('/{id}', name: 'app_bookings_show', methods: ['GET'])]
-    public function show(int $id): JsonResponse
+    public function show(Booking $booking): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $booking = $this->bookingRepository->find($id);
-        if (!$booking) {
-            return new JsonResponse(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
-        }
+        $this->denyAccessUnlessGranted(BookingVoter::VIEW, $booking);
 
-        if ($booking->getUser() !== $user && !$this->isUserSeller($booking, $user)) {
-            return new JsonResponse([
-                'message' => 'Accès non autorisé à cette réservation'
-            ], Response::HTTP_FORBIDDEN);
-        }
-
-        $isSellerView = $this->isUserSeller($booking, $user);
+        $isSellerView = $booking->getProduct()->getUser() === $user;
         $seller = $booking->getProduct()->getUser();
 
         return new JsonResponse([
@@ -464,11 +452,7 @@ final class BookingController extends AbstractController
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
 
-        if (!$this->isUserBuyer($booking, $user)) {
-            return new JsonResponse([
-                'message' => 'Seul l\'acheteur peut payer cette réservation'
-            ], Response::HTTP_FORBIDDEN);
-        }
+        $this->denyAccessUnlessGranted(BookingVoter::PAY, $booking);
 
         if (!$booking->isConfirmed()) {
             return new JsonResponse([
@@ -523,11 +507,7 @@ final class BookingController extends AbstractController
             return new JsonResponse(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
-        if (!$this->isUserBuyer($booking, $user)) {
-            return new JsonResponse([
-                'message' => 'Seul l\'acheteur peut confirmer le paiement'
-            ], Response::HTTP_FORBIDDEN);
-        }
+        $this->denyAccessUnlessGranted(BookingVoter::PAY, $booking);
 
         $data = json_decode($request->getContent(), true);
         $paymentIntentId = $data['payment_intent_id'] ?? '';
@@ -573,6 +553,166 @@ final class BookingController extends AbstractController
         }
     }
 
+    #[Route('/{id}/generate-qr-code', name: 'app_bookings_generate_qr_code', methods: ['POST'])]
+    public function generateQRCode(Booking $booking, Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $this->denyAccessUnlessGranted(BookingVoter::GENERATE_QR, $booking);
+
+        if (!$booking->isConfirmed()) {
+            return new JsonResponse([
+                'message' => 'La réservation doit être confirmée'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if (!$booking->isPaid() && $booking->getTotalPrice() > 0) {
+            return new JsonResponse([
+                'message' => 'La réservation doit être payée'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        if ($booking->isDelivered()) {
+            return new JsonResponse([
+                'message' => 'Cette transaction est déjà finalisée'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $token = bin2hex(random_bytes(32));
+
+            $expiresAt = new \DateTimeImmutable('+5 minutes');
+
+            $qrToken = new QrValidationToken();
+            $qrToken->setBooking($booking)
+                ->setToken($token)
+                ->setExpiresAt($expiresAt)
+                ->setIsUsed(false);
+
+            $this->entityManager->persist($qrToken);
+            $this->entityManager->flush();
+
+            return new JsonResponse([
+                'token' => $token,
+                'expires_at' => $expiresAt->format('c'),
+                'booking_id' => $booking->getId(),
+                'valid_duration' => 300,
+            ]);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => 'Erreur lors de la génération du QR code: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/{id}/validate-transaction', name: 'app_bookings_validate_transaction', methods: ['POST'])]
+    public function validateTransaction(Booking $booking, Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $this->denyAccessUnlessGranted(BookingVoter::VALIDATE_TRANSACTION, $booking);
+
+        $data = json_decode($request->getContent(), true);
+        $token = $data['token'] ?? '';
+        $validationData = $data['validation_data'] ?? [];
+
+        if (empty($token)) {
+            return new JsonResponse([
+                'message' => 'Token requis'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        try {
+            $qrToken = $this->qrValidationTokenRepository->findOneBy([
+                'token' => $token,
+                'booking' => $booking,
+                'isUsed' => false
+            ]);
+
+            if (!$qrToken) {
+                return new JsonResponse([
+                    'message' => 'Token invalide ou déjà utilisé'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            if ($qrToken->getExpiresAt() < new \DateTimeImmutable()) {
+                return new JsonResponse([
+                    'message' => 'Token expiré'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            if (isset($validationData['amount']) && $validationData['amount'] != $booking->getTotalPrice()) {
+                return new JsonResponse([
+                    'message' => 'Montant de validation incorrect'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            $qrToken->setIsUsed(true)
+                ->setUsedAt(new \DateTimeImmutable());
+
+            $booking->setIsDelivered(true)
+                ->setIsDeliveredAt(new \DateTimeImmutable())
+                ->setValidationMethod('qr_code');
+
+            $this->entityManager->flush();
+
+            $this->notificationService->sendTransactionCompletedNotification($booking);
+
+            return new JsonResponse([
+                'message' => 'Transaction validée avec succès',
+                'booking' => [
+                    'id' => $booking->getId(),
+                    'is_completed' => true,
+                    'completed_at' => $booking->getIsDeliveredAt()?->format('c'),
+                    'validation_method' => 'qr_code',
+                    'product' => [
+                        'title' => $booking->getProduct()->getTitle()
+                    ],
+                    'total_price' => $booking->getTotalPrice()
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'message' => 'Erreur lors de la validation: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    #[Route('/{id}/transaction-status', name: 'app_bookings_transaction_status', methods: ['GET'])]
+    public function getTransactionStatus(Booking $booking, Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $this->denyAccessUnlessGranted(BookingVoter::VIEW, $booking);
+
+        return new JsonResponse([
+            'booking_id' => $booking->getId(),
+            'is_confirmed' => $booking->isConfirmed(),
+            'is_paid' => $booking->isPaid(),
+            'is_completed' => $booking->isDelivered(),
+            'completed_at' => $booking->getIsDeliveredAt()?->format('c'),
+            'validation_method' => $booking->getValidationMethod(),
+            'can_generate_qr' => $booking->isConfirmed() &&
+                ($booking->isPaid() || $booking->getTotalPrice() == 0) &&
+                !$booking->isDelivered(),
+            'can_validate' => $booking->isConfirmed() &&
+                ($booking->isPaid() || $booking->getTotalPrice() == 0) &&
+                !$booking->isDelivered() &&
+                ($booking->getProduct()->getUser() === $user)
+        ]);
+    }
+
 
     private function hasActiveBooking(Product $product, User $buyer): bool
     {
@@ -586,15 +726,6 @@ final class BookingController extends AbstractController
         return false;
     }
 
-    private function isUserSeller(Booking $booking, User $user): bool
-    {
-        return $booking->getProduct()->getUser() === $user;
-    }
-
-    private function isUserBuyer(Booking $booking, User $user): bool
-    {
-        return $booking->getUser()?->getId() === $user->getId();
-    }
 
     private function getHoursSinceCreation(Booking $booking): int
     {
