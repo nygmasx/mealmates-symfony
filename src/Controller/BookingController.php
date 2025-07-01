@@ -192,16 +192,11 @@ final class BookingController extends AbstractController
     #[OA\Tag(name: "Bookings")]
     #[Security(name: "Bearer")]
     #[Route('/{id}/respond', name: 'app_bookings_respond', methods: ['PATCH'])]
-    public function respond(int $id, Request $request): JsonResponse
+    public function respond(Booking $booking, Request $request): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
-        }
-
-        $booking = $this->bookingRepository->find($id);
-        if (!$booking) {
-            return new JsonResponse(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
         }
 
         if (!$this->isUserSeller($booking, $user)) {
