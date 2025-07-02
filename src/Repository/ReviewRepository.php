@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Review;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 
 /**
  * @extends ServiceEntityRepository<Review>
@@ -24,7 +25,7 @@ class ReviewRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('r')
             ->andWhere('r.reviewedUser = :user')
             ->andWhere('r.isVisible = true')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), UuidType::NAME)
             ->orderBy('r.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
@@ -59,7 +60,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->addSelect('AVG(r.reliabilityRating) as avgReliability')
             ->andWhere('r.reviewedUser = :user')
             ->andWhere('r.isVisible = true')
-            ->setParameter('user', $user)
+            ->setParameter('user', $user->getId(), UuidType::NAME)
             ->getQuery()
             ->getOneOrNullResult();
 
