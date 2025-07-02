@@ -93,7 +93,7 @@ class Booking
 
     #[ORM\Column(nullable: true)]
     #[Groups(['booking:summary', 'booking:read'])]
-    private ?\\DateTimeImmutable $reviewReminderSentAt = null;
+    private ?\DateTimeImmutable $reviewReminderSentAt = null;
 
     public function __construct()
     {
