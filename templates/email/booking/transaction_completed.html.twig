@@ -379,7 +379,7 @@
             </div>
             {% if booking.validationMethod %}
                 <div class="transaction-number">
-                    <strong>Méthode de validation :</strong> 
+                    <strong>Méthode de validation :</strong>
                     {% if booking.validationMethod == 'qr_code' %}
                         QR Code
                     {% else %}
@@ -408,7 +408,7 @@
         </div>
 
         <div class="products-section">
-            <h2 class="section-title">📦 Produits 
+            <h2 class="section-title">📦 Produits
             {% if recipientRole == 'buyer' %}
                 achetés
             {% else %}
@@ -497,7 +497,7 @@
                     Comment s'est passée cette vente ? Votre retour nous aide à améliorer l'expérience pour tous.
                 {% endif %}
             </p>
-            <a href="https://mealmates.testingtest.fr/bookings/{{ booking.id }}/review" class="cta-button">
+            <a href="https://mealmates.testingtest.fr/messages/{{ booking.chat.id }}" class="cta-button">
                 ⭐ Laisser un avis
             </a>
         </div>
