@@ -183,13 +183,9 @@ final class ReviewController extends AbstractController
     #[OA\Response(response: 404, description: "Utilisateur non trouvé")]
     #[OA\Tag(name: "Reviews")]
     #[Route('/user/{id}', name: 'app_reviews_user', methods: ['GET'])]
-    public function getUserReviews(string $id): JsonResponse
+    public function getUserReviews(User $user): JsonResponse
     {
         try {
-            $user = $this->userRepository->find($id);
-            if (!$user) {
-                return new JsonResponse(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
-            }
 
             $reviews = $this->reviewRepository->findVisibleReviewsForUser($user);
 
@@ -243,14 +239,9 @@ final class ReviewController extends AbstractController
     #[OA\Response(response: 404, description: "Utilisateur non trouvé")]
     #[OA\Tag(name: "Reviews")]
     #[Route('/user/{id}/stats', name: 'app_reviews_user_stats', methods: ['GET'])]
-    public function getUserReviewStats(string $id): JsonResponse
+    public function getUserReviewStats(User $user): JsonResponse
     {
         try {
-            $user = $this->userRepository->find($id);
-            if (!$user) {
-                return new JsonResponse(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
-            }
-
             $stats = $this->reviewRepository->getAverageRatingsForUser($user);
 
             return new JsonResponse($stats);
@@ -282,7 +273,7 @@ final class ReviewController extends AbstractController
     #[OA\Tag(name: "Reviews")]
     #[Security(name: "Bearer")]
     #[Route('/booking/{id}/status', name: 'app_reviews_booking_status', methods: ['GET'])]
-    public function getBookingReviewStatus(string $id): JsonResponse
+    public function getBookingReviewStatus(Booking $booking): JsonResponse
     {
         $user = $this->getUser();
         if (!$user) {
@@ -290,11 +281,6 @@ final class ReviewController extends AbstractController
         }
 
         try {
-            $booking = $this->bookingRepository->find($id);
-            if (!$booking) {
-                return new JsonResponse(['message' => 'Réservation non trouvée'], Response::HTTP_NOT_FOUND);
-            }
-
             $isBuyer = $booking->getUser() === $user;
             $isSeller = $booking->getProduct()->getUser() === $user;
 
@@ -349,14 +335,9 @@ final class ReviewController extends AbstractController
     #[OA\Response(response: 404, description: "Avis non trouvé")]
     #[OA\Tag(name: "Reviews")]
     #[Route('/{id}', name: 'app_reviews_show', methods: ['GET'])]
-    public function show(string $id): JsonResponse
+    public function show(Review $review): JsonResponse
     {
         try {
-            $review = $this->reviewRepository->find($id);
-            if (!$review) {
-                return new JsonResponse(['message' => 'Avis non trouvé'], Response::HTTP_NOT_FOUND);
-            }
-
             $this->denyAccessUnlessGranted(ReviewVoter::VIEW, $review);
 
             return new JsonResponse([
