@@ -83,6 +83,18 @@ class Booking
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $validationMethod = null;
 
+    #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
+    private ?bool $buyerReviewLeft = false;
+
+    #[ORM\Column]
+    #[Groups(['booking:summary', 'booking:read'])]
+    private ?bool $sellerReviewLeft = false;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['booking:summary', 'booking:read'])]
+    private ?\\DateTimeImmutable $reviewReminderSentAt = null;
+
     public function __construct()
     {
         $this->qrValidationTokens = new ArrayCollection();
@@ -309,5 +321,64 @@ class Booking
         $this->validationMethod = $validationMethod;
 
         return $this;
+    }
+
+    public function isBuyerReviewLeft(): ?bool
+    {
+        return $this->buyerReviewLeft;
+    }
+
+    public function setBuyerReviewLeft(bool $buyerReviewLeft): static
+    {
+        $this->buyerReviewLeft = $buyerReviewLeft;
+
+        return $this;
+    }
+
+    public function isSellerReviewLeft(): ?bool
+    {
+        return $this->sellerReviewLeft;
+    }
+
+    public function setSellerReviewLeft(bool $sellerReviewLeft): static
+    {
+        $this->sellerReviewLeft = $sellerReviewLeft;
+
+        return $this;
+    }
+
+    public function getReviewReminderSentAt(): ?\DateTimeImmutable
+    {
+        return $this->reviewReminderSentAt;
+    }
+
+    public function setReviewReminderSentAt(?\DateTimeImmutable $reviewReminderSentAt): static
+    {
+        $this->reviewReminderSentAt = $reviewReminderSentAt;
+
+        return $this;
+    }
+
+    public function areAllReviewsCompleted(): bool
+    {
+        return $this->buyerReviewLeft && $this->sellerReviewLeft;
+    }
+
+    public function canSendReviewReminder(): bool
+    {
+        if (!$this->isDelivered()) {
+            return false;
+        }
+
+        if ($this->areAllReviewsCompleted()) {
+            return false;
+        }
+
+        if ($this->reviewReminderSentAt === null) {
+            return true;
+        }
+
+        $daysSinceLastReminder = (new \DateTimeImmutable())->diff($this->reviewReminderSentAt)->days;
+        return $daysSinceLastReminder >= 7;
     }
 }

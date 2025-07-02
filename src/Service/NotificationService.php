@@ -267,4 +267,46 @@ class NotificationService
 
         $this->mailer->send($sellerEmail);
     }
+
+    public function sendReviewReminderNotification(Booking $booking): void
+    {
+        $seller = $booking->getProduct()->getUser();
+        $buyer = $booking->getUser();
+        $buyerName = $buyer->getFirstName() . ' ' . $buyer->getLastName();
+        $sellerName = $seller->getFirstName() . ' ' . $seller->getLastName();
+
+        $buyerEmail = new TemplatedEmail()
+            ->from(new Address('sallakimrane@gmail.com', 'Meal Mates'))
+            ->to($buyer->getEmail())
+            ->subject("⭐ {$buyerName}, partagez votre expérience !")
+            ->htmlTemplate('email/booking/review_reminder.html.twig')
+            ->context([
+                'booking' => $booking,
+                'buyerName' => $buyerName,
+                'sellerName' => $sellerName,
+                'recipientRole' => 'buyer'
+            ]);
+
+        $buyerEmail->getHeaders()
+            ->addTextHeader('X-Mailin-Tag', 'review-reminder-buyer');
+
+        $this->mailer->send($buyerEmail);
+
+        $sellerEmail = new TemplatedEmail()
+            ->from(new Address('sallakimrane@gmail.com', 'Meal Mates'))
+            ->to($seller->getEmail())
+            ->subject("⭐ {$sellerName}, évaluez votre acheteur !")
+            ->htmlTemplate('email/booking/review_reminder.html.twig')
+            ->context([
+                'booking' => $booking,
+                'buyerName' => $buyerName,
+                'sellerName' => $sellerName,
+                'recipientRole' => 'seller'
+            ]);
+
+        $sellerEmail->getHeaders()
+            ->addTextHeader('X-Mailin-Tag', 'review-reminder-seller');
+
+        $this->mailer->send($sellerEmail);
+    }
 }

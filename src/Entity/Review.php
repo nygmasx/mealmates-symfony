@@ -60,7 +60,6 @@ class Review
     #[Groups(['review:read'])]
     private ?int $friendlinessRating = null;
 
-    // Critères pour vendeur -> acheteur
     #[ORM\Column(type: 'smallint', nullable: true)]
     #[Assert\Range(min: 1, max: 5)]
     #[Groups(['review:read'])]
