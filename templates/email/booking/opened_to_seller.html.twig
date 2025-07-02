@@ -371,14 +371,11 @@
         </div>
 
         <div class="action-buttons">
-            <a href="https://mealmates.testingtest.fr/messages/{{ booking.chat.id }}/confirm" class="btn btn-confirm">
+            <a href="https://mealmates.testingtest.fr/messages/{{ booking.chat.id }}" class="btn btn-confirm">
                 ✅ Confirmer la réservation
             </a>
-            <a href="https://mealmates.testingtest.fr/bookings/{{ booking.id }}/reject" class="btn btn-reject">
-                ❌ Refuser la demande
-            </a>
             <br>
-            <a href="https://mealmates.testingtest.fr/bookings/{{ booking.id }}" class="btn btn-view">
+            <a href="https://mealmates.testingtest.fr/profile/bookings" class="btn btn-view">
                 👁️ Voir les détails
             </a>
         </div>
@@ -410,7 +407,7 @@
         <p><strong>Meal Mates</strong> - Ensemble contre le gaspillage alimentaire</p>
         <p>
             <a href="https://mealmates.testingtest.fr">Accueil</a> |
-            <a href="https://mealmates.testingtest.fr/seller-dashboard">Tableau de bord vendeur</a> |
+            <a href="https://mealmates.testingtest.fr/profile">Tableau de bord vendeur</a> |
         </p>
         <p style="font-size: 12px; color: #999;">
             Cet email a été envoyé à {{ booking.product.user.email }}.
